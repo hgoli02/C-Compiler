@@ -1,10 +1,11 @@
 class Node:
     
-    def __init__(self, number, terminal, move_pointer_back):
+    def __init__(self, number, terminal, move_pointer_back, error=False):
         self.number = number
         self.terminal = terminal
         self.move_pointer_back = move_pointer_back
         self.moves = {}
+        self.error = error
         
     def add_path(self, destination_num, move):
         self.moves[move] = destination_num
