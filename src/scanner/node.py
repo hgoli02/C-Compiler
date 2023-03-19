@@ -1,8 +1,8 @@
 class Node:
     
-    def __init__(self, number, is_finished, move_pointer_back):
+    def __init__(self, number, terminal, move_pointer_back):
         self.number = number
-        self.is_finished = is_finished
+        self.terminal = terminal
         self.move_pointer_back = move_pointer_back
         self.moves = {}
         
