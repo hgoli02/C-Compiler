@@ -10,10 +10,6 @@ whitespace = set([' ', '\n', '\r', '\t', '\v', '\f'])
 language = set([*digits, *letters, *all_symbols, *whitespace, 'eof'])
 keywords = set(['if', 'else', 'void', 'int', 'repeat', 'break', 'until', 'return'])
 
-if __name__ == '__main__':
-    print(digits | letters)
-    print(all_symbols - definite_symbols)
-
 class Type(Enum):
     NUMBER = 'NUM'
     IDENTIFIER = 'ID'
@@ -84,17 +80,17 @@ class DFA:
         node10.add_path(11, language - set('*'))
         node10.add_path(12, set('*'))
         
-        node12.add_path(12, language - set('*')) #Todo: everything except *
-        node12.add_path(13, set('*'))
-        node12.add_path(16, set('eof'))
+        node12.add_path(12, language - set(['*'])) #Todo: everything except *
+        node12.add_path(13, set(['*']))
+        node12.add_path(16, set(['eof']))
         
         node13.add_path(12, language - set(['/', '*']))
-        node13.add_path(13, set('*'))
-        node13.add_path(14, set('/'))
-        node13.add_path(16, set('eof'))
+        node13.add_path(13, set(['*']))
+        node13.add_path(14, set(['/']))
+        node13.add_path(16, set(['eof']))
         
-        node17.add_path(18, language - set('/'))
-        node17.add_path(19, set('/'))
+        node17.add_path(18, language - set(['/']))
+        node17.add_path(19, set(['/']))
 
 
         
@@ -118,3 +114,7 @@ class DFA:
         self.all_nodes.append(node17)
         self.all_nodes.append(node18)
         self.all_nodes.append(node19)        
+
+if __name__ == '__main__':
+    dfa = DFA()
+    print(dfa.all_nodes[12].moves)

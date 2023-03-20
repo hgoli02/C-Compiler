@@ -9,8 +9,8 @@ class Scanner():
     def __init__(self, file):
         self.reader = Reader(file)
         self.dfa = DFA()
-        self.set_current_node(0)
         self.buffer = ''
+        self.set_current_node(0)
         self.symbol_table = ['break', 'else', 'if', 'int', 'repeat', 'return', 'until', 'void']
         
     def scan(self):

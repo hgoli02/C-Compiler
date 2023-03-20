@@ -13,6 +13,6 @@ class Node:
         
     def get_next_node(self, move):
         for key in self.moves.keys():
-            if move in key:
+            if move == key:
                 return self.moves[key]
         return -1

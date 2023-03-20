@@ -10,6 +10,8 @@ if __name__ == '__main__':
     while True:
         output = scanner.scan()
         if output[0] == 'Invalid input':
+            if (scanner.reader.file_ended):
+                break
             output_string = "(" + str(output[0]) + ', ' + str(output[1]) + ")"
             output_dict[scanner.reader.get_lineno()].append(output_string)
         elif output[0] == Type.ERROR1 or output[0] == Type.ERROR2 or output[0] == Type.ERROR3:
@@ -21,10 +23,17 @@ if __name__ == '__main__':
         if scanner.reader.file_ended:
             break
 
-    for key in output_dict.keys():
-        print(f"{key}.\t")
-        for i in output_dict[key]:
-            print(i)
+    #Token
+    token_print = ''
+    for key in sorted(output_dict.keys()):
+        token_print += str(key) + '.\t'
+        for token in output_dict[key]:
+            token_print += token
+            token_print += ' ' #TODO: check last space
+        token_print += '\n'
+    
+    print(token_print)
+
 
     #Symbol table
     symbol_table_print = ''
@@ -33,3 +42,13 @@ if __name__ == '__main__':
     
     print(symbol_table_print)
 
+    lexical_print = ''
+    for key in lexical_dict.keys():
+        lexical_print += f'{key}.\t'
+        for i in lexical_dict[key]:
+            lexical_print += i + " "
+        lexical_print += '\n'
+
+    if lexical_print == '':
+        lexical_print = 'There is no lexical error.'
+    print(lexical_print)
