@@ -78,7 +78,7 @@ class DFA:
         node4.add_path(5, whitespace | all_symbols)
         
         node7.add_path(8, set('='))
-        node7.add_path(9, language - set(['=']))
+        node7.add_path(9, language - set(['=']) | set(['/']))
         
         node10.add_path(11, language - set(['*', '/']))
         node10.add_path(12, set(['*']))
