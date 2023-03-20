@@ -4,6 +4,7 @@ from enum import Enum
 
 digits = set([str(i) for i in range(10)])
 letters = set(string.ascii_letters)
+printables = set(string.printable)
 definite_symbols = set([*';:,[](){}+-<'])
 all_symbols = set([*';:,[](){}+-<=*/'])
 whitespace = set([' ', '\n', '\r', '\t', '\v', '\f'])
@@ -80,7 +81,7 @@ class DFA:
         node10.add_path(11, language - set('*'))
         node10.add_path(12, set('*'))
         
-        node12.add_path(12, language - set(['*'])) #Todo: everything except *
+        node12.add_path(12, printables - set(['*'])) #Todo: everything except *
         node12.add_path(13, set(['*']))
         node12.add_path(16, set(['eof']))
         

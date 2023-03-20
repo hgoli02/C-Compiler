@@ -14,7 +14,10 @@ class Scanner():
         self.symbol_table = ['break', 'else', 'if', 'int', 'repeat', 'return', 'until', 'void']
         
     def scan(self):
+        start_line = None
         while True:
+            if self.current_node_id == 0:
+                start_line = self.reader.get_lineno()
             char = self.reader.read_char()                
             self.buffer += char
             next_node_id = self.current_node.get_next_node(char)
@@ -33,7 +36,7 @@ class Scanner():
                     type_ = self.current_node.type
                     self.empty_buffer()
                     self.set_current_node(0)
-                    return type_, buffer
+                    return type_, buffer, start_line
                 else:
                     if self.current_node.move_pointer_back:
                         self.buffer = self.buffer[:-1]

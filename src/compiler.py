@@ -5,7 +5,7 @@ from scanner.graph import *
 if __name__ == '__main__':
     output_dict = defaultdict(list)
     lexical_dict = defaultdict(list)
-    scanner = Scanner('src/input.txt')
+    scanner = Scanner('input.txt')
     has_line_number_been_printed = False
     while True:
         output = scanner.scan()
@@ -19,7 +19,7 @@ if __name__ == '__main__':
             if len(tmp) >= 7:
                 tmp = tmp[:7] + '...'
             output_string = "(" + tmp + ', ' + str(output[0].value) + ")"
-            lexical_dict[scanner.reader.get_lineno()].append(output_string)
+            lexical_dict[output[2]].append(output_string)
         else:
             output_string = "(" + str(output[0].value) + ', ' + str(output[1]) + ")"
             output_dict[scanner.reader.get_lineno()].append(output_string) 
@@ -35,7 +35,7 @@ if __name__ == '__main__':
             token_print += ' ' #TODO: check last space
         token_print += '\n'
     
-    #print(token_print)
+    print(token_print)
     f = open('tokens.txt', 'w')
     f.write(token_print)
     f.close()
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     for i in range(len(scanner.symbol_table)):
         symbol_table_print += str(i + 1) + '.\t' + scanner.symbol_table[i] + '\n'
     
-    #print(symbol_table_print)
+    print(symbol_table_print)
     f = open('symbol_table.txt', 'w')
     f.write(symbol_table_print)
     f.close()
@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
     if lexical_print == '':
         lexical_print = 'There is no lexical error.'
-    #print(lexical_print)
+    print(lexical_print)
     f = open('lexical_errors.txt', 'w')
     f.write(lexical_print)
     f.close()
