@@ -84,7 +84,7 @@ class DFA:
         node10.add_path(11, language - set('*'))
         node10.add_path(12, set('*'))
         
-        node12.add_path(12, language - set('*'))
+        node12.add_path(12, language - set('*')) #Todo: everything except *
         node12.add_path(13, set('*'))
         node12.add_path(16, set('eof'))
         

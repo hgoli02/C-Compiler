@@ -11,7 +11,7 @@ class Scanner():
         self.dfa = DFA()
         self.set_current_node(0)
         self.buffer = ''
-        self.symbol_table = list(keywords)
+        self.symbol_table = ['break', 'else', 'if', 'int', 'repeat', 'return', 'until', 'void']
         
     def scan(self):
         while True:
@@ -53,7 +53,8 @@ class Scanner():
             if (self.buffer.lower() in keywords):
                 return Type.KEYWORD, self.buffer
             else:
-                self.symbol_table.append(self.buffer)
+                if (self.buffer not in self.symbol_table):
+                    self.symbol_table.append(self.buffer)
                 return  Type.IDENTIFIER, self.buffer
         elif (self.current_node.type == Type.COMMENT or self.current_node.type == Type.WHITESPACE):
             return None
