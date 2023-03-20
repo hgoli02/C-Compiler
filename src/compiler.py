@@ -8,8 +8,6 @@ if __name__ == '__main__':
     scanner = Scanner('input.txt')
     has_line_number_been_printed = False
     while True:
-        if scanner.reader.get_lineno() == 33:
-            print("sag")
         output = scanner.scan()
         if output[0] == 'Invalid input':
             if (scanner.reader.file_ended):

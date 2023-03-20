@@ -1,9 +1,6 @@
 from scanner.graph import *
 from scanner.reader import Reader
 
-if __name__ == '__main__':
-    print(digits)
-
 class Scanner():
     
     def __init__(self, file):
@@ -12,7 +9,7 @@ class Scanner():
         self.buffer = ''
         self.set_current_node(0)
         self.symbol_table = ['break', 'else', 'if', 'int', 'repeat', 'return', 'until', 'void']
-        
+
     def scan(self):
         start_line = None
         while True:
@@ -33,7 +30,7 @@ class Scanner():
             if self.current_node.terminal:
                 if self.current_node.type == Type.ERROR1 or self.current_node.type == Type.ERROR2 or self.current_node.type == Type.ERROR3 or self.current_node.type == Type.ERROR4:
                     if self.current_node.move_pointer_back:
-                        self.buffer = self.buffer[:-1]
+                        self.remove_last_buff()
                         self.reader.move_pointer_back()
                     buffer = self.buffer
                     type_ = self.current_node.type
@@ -42,7 +39,7 @@ class Scanner():
                     return type_, buffer, start_line
                 else:
                     if self.current_node.move_pointer_back:
-                        self.buffer = self.buffer[:-1]
+                        self.remove_last_buff()
                         self.reader.move_pointer_back()
 
                     token = self.get_token()
@@ -73,3 +70,11 @@ class Scanner():
     
     def empty_buffer(self):
         self.buffer = ''    
+
+    def remove_last_buff(self):
+        if len(self.buffer) > 3 and self.buffer[-3:] == 'eof':
+            self.buffer = self.buffer[:-3]
+        else:
+            self.buffer = self.buffer[:-1]
+    
+

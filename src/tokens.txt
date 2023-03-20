@@ -28,4 +28,4 @@
 31.	(ID, output) (SYMBOL, () (ID, f) (SYMBOL, () (NUM, 40) (SYMBOL, ,) (ID, result) (SYMBOL, )) (SYMBOL, )) (SYMBOL, ;) 
 32.	(ID, output) (SYMBOL, () (ID, count) (SYMBOL, )) (SYMBOL, ;) 
 33.	(SYMBOL, }) 
-34.	(NUM, 1941eo) 
+34.	(NUM, 1941) 
