@@ -26,12 +26,15 @@ class Scanner():
                 buffer = self.buffer
                 self.empty_buffer()
                 self.set_current_node(0)
-                return "Invalid input", buffer
+                return Type.ERROR4, buffer, start_line
 
             self.set_current_node(next_node_id)
 
             if self.current_node.terminal:
-                if self.current_node.type == Type.ERROR1 or self.current_node.type == Type.ERROR2 or self.current_node.type == Type.ERROR3:
+                if self.current_node.type == Type.ERROR1 or self.current_node.type == Type.ERROR2 or self.current_node.type == Type.ERROR3 or self.current_node.type == Type.ERROR4:
+                    if self.current_node.move_pointer_back:
+                        self.buffer = self.buffer[:-1]
+                        self.reader.move_pointer_back()
                     buffer = self.buffer
                     type_ = self.current_node.type
                     self.empty_buffer()

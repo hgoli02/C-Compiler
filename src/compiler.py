@@ -8,13 +8,17 @@ if __name__ == '__main__':
     scanner = Scanner('input.txt')
     has_line_number_been_printed = False
     while True:
+        if scanner.reader.get_lineno() == 33:
+            print("sag")
         output = scanner.scan()
         if output[0] == 'Invalid input':
             if (scanner.reader.file_ended):
                 break
             output_string = "(" + str(output[1]) + ', ' + str(output[0]) + ")"
             lexical_dict[scanner.reader.get_lineno()].append(output_string)
-        elif output[0] == Type.ERROR1 or output[0] == Type.ERROR2 or output[0] == Type.ERROR3:
+        elif output[0] == Type.ERROR1 or output[0] == Type.ERROR2 or output[0] == Type.ERROR3 or output[0] == Type.ERROR4:
+            if (scanner.reader.file_ended and output[0] == Type.ERROR4):
+                break
             tmp = str(output[1])
             if len(tmp) >= 7:
                 tmp = tmp[:7] + '...'

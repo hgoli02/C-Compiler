@@ -6,7 +6,7 @@ digits = set([str(i) for i in range(10)])
 letters = set(string.ascii_letters)
 printables = set(string.printable)
 definite_symbols = set([*';:,[](){}+-<'])
-all_symbols = set([*';:,[](){}+-<=*/'])
+all_symbols = set([*';:,[](){}+-<=*'])
 whitespace = set([' ', '\n', '\r', '\t', '\v', '\f'])
 language = set([*digits, *letters, *all_symbols, *whitespace, 'eof'])
 keywords = set(['if', 'else', 'void', 'int', 'repeat', 'break', 'until', 'return'])
@@ -21,6 +21,7 @@ class Type(Enum):
     ERROR1 = 'Invalid number'
     ERROR2 = 'Unclosed comment'
     ERROR3 = 'Unmatched comment'
+    ERROR4 = 'Invalid input'
 
 class DFA:
     
@@ -42,7 +43,7 @@ class DFA:
         node8 = Node(8, True, False, type=Type.SYMBOL) #symbol ==
         node9 = Node(9, True, True, type=Type.SYMBOL)  #symbol =
         node10 = Node(10, False, False, type=Type.SYMBOL) #symbol 
-        node11 = Node(11, True, True, type=Type.SYMBOL) #symbol /
+        node11 = Node(11, True, True, type=Type.ERROR4) #symbol / #TODO:CHECK ERROR
         
         #Comment
         node12 = Node(12, False, False) #
@@ -59,6 +60,7 @@ class DFA:
         
         #unmatched comment
         node19 = Node(19, True, False, type=Type.ERROR3) 
+        node20 = Node(20, True, True, type=Type.ERROR4)
     
         node0.add_path(1, digits)
         node0.add_path(6, definite_symbols)
@@ -76,10 +78,12 @@ class DFA:
         node4.add_path(5, whitespace | all_symbols)
         
         node7.add_path(8, set('='))
-        node7.add_path(9, language - set('='))
+        node7.add_path(9, language - set(['=']))
         
-        node10.add_path(11, language - set('*'))
-        node10.add_path(12, set('*'))
+        node10.add_path(11, language - set(['*', '/']))
+        node10.add_path(12, set(['*']))
+        node10.add_path(20, set(['/']))
+
         
         node12.add_path(12, printables - set(['*'])) #Todo: everything except *
         node12.add_path(13, set(['*']))
@@ -115,6 +119,7 @@ class DFA:
         self.all_nodes.append(node17)
         self.all_nodes.append(node18)
         self.all_nodes.append(node19)        
+        self.all_nodes.append(node20)        
 
 if __name__ == '__main__':
     dfa = DFA()

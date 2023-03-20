@@ -19,4 +19,5 @@ class Reader:
         return self.line_number
 
     def move_pointer_back(self):
-        self.file.seek(-1, 1)
+        if not self.file_ended:
+            self.file.seek(-1, 1)
