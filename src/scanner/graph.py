@@ -1,14 +1,18 @@
 import string
-from node import Node
+from .node import Node
 from enum import Enum
 
 digits = set([str(i) for i in range(10)])
 letters = set(string.ascii_letters)
 definite_symbols = set([*';:,[](){}+-<'])
 all_symbols = set([*';:,[](){}+-<=*/'])
-whitespace = ' ', '\n', '\r', '\t', '\v', '\f'
-language = set([*digits, *letters, *all_symbols, *whitespace])
-keywords = set(['if', 'else', 'void', 'int', 'repear', 'break', 'until', 'return'])
+whitespace = set([' ', '\n', '\r', '\t', '\v', '\f'])
+language = set([*digits, *letters, *all_symbols, *whitespace, 'eof'])
+keywords = set(['if', 'else', 'void', 'int', 'repeat', 'break', 'until', 'return'])
+
+if __name__ == '__main__':
+    print(digits | letters)
+    print(all_symbols - definite_symbols)
 
 class Type(Enum):
     NUMBER = 'NUM'
@@ -20,12 +24,6 @@ class Type(Enum):
     ERROR1 = 'Invalid number'
     ERROR2 = 'Unclosed comment'
     ERROR3 = 'Unmatched comment'
-
-if __name__ == '__main__':
-    a = Type.COMMENT
-    b = Type.COMMENT
-    if a == b:
-        print('yes')
 
 class DFA:
     
@@ -68,8 +66,8 @@ class DFA:
         node0.add_path(1, digits)
         node0.add_path(6, definite_symbols)
         node0.add_path(7, set('='))
-        node0.add_path(10, '/')
-        node0.add_path(17, '*')
+        node0.add_path(10, set('/'))
+        node0.add_path(17, set('*'))
         node0.add_path(15, whitespace)
         node0.add_path(4, letters)
         
@@ -77,26 +75,26 @@ class DFA:
         node1.add_path(2, letters)
         node1.add_path(3, language - digits - letters)
         
-        node4.add_path(4, digits + letters)
-        node4.add_path(5, whitespace + all_symbols)
+        node4.add_path(4, digits | letters)
+        node4.add_path(5, whitespace | all_symbols)
         
-        node7.add_path(8, set('=',))
-        node7.add_path(9, language - set('=',))
+        node7.add_path(8, set('='))
+        node7.add_path(9, language - set('='))
         
-        node10.add_path(11, language - set('*',))
-        node10.add_path(12, set('*',))
+        node10.add_path(11, language - set('*'))
+        node10.add_path(12, set('*'))
         
-        node12.add_path(12, language - set('*',))
-        node12.add_path(13, set('*',))
-        node12.add_path(16, set('eof',))
+        node12.add_path(12, language - set('*'))
+        node12.add_path(13, set('*'))
+        node12.add_path(16, set('eof'))
         
-        node13.add_path(12, language - set('/', '*'))
-        node13.add_path(13, set('*',))
-        node13.add_path(14, set('/',))
-        node13.add_path(16, set('eof',))
+        node13.add_path(12, language - set(['/', '*']))
+        node13.add_path(13, set('*'))
+        node13.add_path(14, set('/'))
+        node13.add_path(16, set('eof'))
         
-        node17.add_path(18, language - set('/',))
-        node17.add_path(19, set('/',))
+        node17.add_path(18, language - set('/'))
+        node17.add_path(19, set('/'))
 
 
         

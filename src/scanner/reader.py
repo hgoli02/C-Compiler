@@ -3,6 +3,7 @@ class Reader:
     def __init__(self, file):
         self.line_number = 1
         self.file = open(file, "rb")
+        self.file_ended = False
         
     def read_char(self):
         char = self.file.read(1).decode('ascii')
@@ -10,6 +11,7 @@ class Reader:
             self.line_number += 1
         if not char:
             self.file.close()
+            self.file_ended = True
             return 'eof'
         return char
     
