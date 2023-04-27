@@ -1,3 +1,4 @@
+from anytree import Node as AnyNode, RenderTree
 from scanner.scanner import Scanner
 from scanner.graph import Type
 EPSILON = 'EPSILON'
@@ -22,6 +23,7 @@ class Parser:
         self.non_terminals = data['non-terminal']
         self.firsts = data['first']
         self.follows = data['follow']
+        self.anyroot = AnyNode('Program')
 
         with open('parser/grammer.txt', 'r') as f:
             grammer_input = f.read()
@@ -77,29 +79,35 @@ class Parser:
     def parse(self):
         
         current_node = self.root_nodes['Program'] #TODO: get start node
-
+        current_anynode = self.anyroot
         while True:
             print(current_node)
             if current_node.is_terminal:
                 node = self.stack.pop()
                 current_node = node
+                for pre, fill, node in RenderTree(self.anyroot):
+                    print("%s%s" % (pre, node.name))
                 continue
 
             else:
                 flag = False
                 for transition in current_node.transitions:
                     if transition in self.terminals and self.current_token_grammer == transition:
+                        print(transition)
+                        current_anynode = AnyNode(transition, parent=current_anynode)
                         current_node = current_node.get_next_node(transition)
                         self.update_current_token()
                         flag = True
                         break
                     elif transition in self.non_terminals and self.current_token_grammer in self.firsts[transition]:
+                        current_anynode = AnyNode(transition, parent=current_anynode)
                         stack_node = current_node.get_next_node(transition)
                         self.stack.append(stack_node)
                         current_node = self.root_nodes[transition]
                         flag = True
                         break
                     elif transition in self.non_terminals and EPSILON in self.firsts[transition] and self.current_token_grammer in self.follows[transition]:
+                        current_anynode = AnyNode(transition, parent=current_anynode)
                         stack_node = current_node.get_next_node(transition)
                         self.stack.append(stack_node)
                         current_node = self.root_nodes[transition]
@@ -114,15 +122,22 @@ class Parser:
 
                 
 class Node:
+    node_id = 0
+    
     # transitions = {(non) terminal: node_id}
     def __init__(self, transitions, tree_value, is_terminal=False):
         self.transitions = transitions
         self.is_terminal = is_terminal
         self.tree_value = tree_value
+        Node.node_id += 1
+        self.node_id = Node.node_id
 
     def get_next_node(self, transition):
         #error handling later
         return self.transitions[transition]
+
+    def get_id(self):
+        return self.node_id
 
     def __str__(self):
         return str(self.tree_value) + "|" + str(self.transitions.keys())    
