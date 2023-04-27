@@ -1,7 +1,10 @@
+import os
+
 class Reader:
     
     def __init__(self, file):
         self.line_number = 1
+        print (os.getcwd())
         self.file = open(file, "rb")
         self.file_ended = False
         
