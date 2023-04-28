@@ -79,8 +79,12 @@ class Parser:
             self.current_token_grammer = '$'
             
     def print_tree(self):
-        for pre, fill, node in RenderTree(self.anyroot):
-            print("%s%s" % (pre.encode('utf8').decode('ascii', 'ignore'), node.name))
+        file_str = ''
+        for pre, _, node in RenderTree(self.anyroot):
+            file_str += "%s%s" % (pre, node.name) + '\n'
+            
+        return file_str
+        
     def parse(self):
         
         current_node = self.root_nodes['Program'] #TODO: get start node
@@ -130,7 +134,8 @@ class Parser:
                     AnyNode('epsilon', parent=current_anynode)
                     current_anynode = self.anystack.pop()
                     continue 
-        self.print_tree()
+        return self.print_tree()
+        
 
                 
 class Node:
