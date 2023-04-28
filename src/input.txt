@@ -1,7 +1,17 @@
-/* sample 1 */
+/* sample 6 */
 
-void main(void){
-	int a;
-	int b;
-	a = a + b;
+int fact ( int n )
+{
+    int f;
+    if (n = 1){
+        f = 1;
+        return 1;
+       }
+    else
+        f = n * factorial ( n - 1 );
+    return f;
+}
+void main ( void )
+{
+     output (factorial(3));
 }

@@ -1,4 +1,3 @@
-from collections import defaultdict
 from scanner.scanner import Scanner
 from scanner.graph import *
 from parser.parser import Parser

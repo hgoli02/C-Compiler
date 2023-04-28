@@ -40,5 +40,5 @@ Var-prime -> [ Expression ] | EPSILON
 Factor-prime -> ( Args ) | EPSILON
 Factor-zegond -> ( Expression ) | NUM
 Args -> Arg-list | EPSILON
-Arg-list -> Expression Arg-list-prim
+Arg-list -> Expression Arg-list-prime
 Arg-list-prime -> , Expression Arg-list-prime | EPSILON

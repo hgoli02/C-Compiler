@@ -66,7 +66,7 @@ class Parser:
         self.current_token_value = self.current_token[1]
         self.current_token_grammer = self.current_token_type
 
-        # print(f"updating current token: {self.current_token_value}")
+        print(f"updating current token: {self.current_token_value}")
         if self.current_token_type == Type.KEYWORD:
             self.current_token_grammer = self.current_token_value
         elif self.current_token_type == Type.IDENTIFIER:
@@ -83,7 +83,7 @@ class Parser:
         for pre, _, node in RenderTree(self.anyroot):
             file_str += "%s%s" % (pre, node.name) + '\n'
             
-        return file_str
+        return file_str.strip()
         
     def parse(self):
         
@@ -95,6 +95,7 @@ class Parser:
                 break
                 
             if current_node.is_terminal:
+                
                 current_node = self.stack.pop()
                 current_anynode = self.anystack.pop()
                 continue
