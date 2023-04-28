@@ -80,8 +80,7 @@ class Parser:
             
     def print_tree(self):
         for pre, fill, node in RenderTree(self.anyroot):
-                    print("%s%s" % (pre, node.name))
-
+            print("%s%s" % (pre.encode('utf8').decode('ascii', 'ignore'), node.name))
     def parse(self):
         
         current_node = self.root_nodes['Program'] #TODO: get start node
