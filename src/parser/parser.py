@@ -66,8 +66,7 @@ class Parser:
         self.current_token_value = self.current_token[1]
         self.current_token_grammer = self.current_token_type
 
-        print(f"updating current token: {self.current_token_value}")
-        
+        # print(f"updating current token: {self.current_token_value}")
         if self.current_token_type == Type.KEYWORD:
             self.current_token_grammer = self.current_token_value
         elif self.current_token_type == Type.IDENTIFIER:
@@ -76,6 +75,8 @@ class Parser:
             self.current_token_grammer = 'NUM'
         elif self.current_token_type == Type.SYMBOL:
             self.current_token_grammer = self.current_token_value
+        elif self.current_token_value == "eof":
+            self.current_token_grammer = '$'
             
     def print_tree(self):
         for pre, fill, node in RenderTree(self.anyroot):
@@ -86,10 +87,13 @@ class Parser:
         current_node = self.root_nodes['Program'] #TODO: get start node
         current_anynode = self.anyroot
         while True:
+            if self.current_token_grammer == '$' and current_node.tree_value == 'Program':
+                AnyNode('$', parent=current_anynode)
+                break
+                
             if current_node.is_terminal:
                 current_node = self.stack.pop()
                 current_anynode = self.anystack.pop()
-                self.print_tree()
                 continue
 
             else:
@@ -99,9 +103,6 @@ class Parser:
                         current_node = current_node.get_next_node(transition)
                         AnyNode(f'({self.current_token_type.value}, {self.current_token_value})',
                                                   parent=current_anynode)
-                        # print(current_anynode)
-                        # print(self.anystack)
-                        # print("########################")
                         self.update_current_token()
                         flag = True
                         break
@@ -130,7 +131,7 @@ class Parser:
                     AnyNode('epsilon', parent=current_anynode)
                     current_anynode = self.anystack.pop()
                     continue 
-
+        self.print_tree()
 
                 
 class Node:
