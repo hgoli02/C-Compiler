@@ -13,6 +13,7 @@ class Parser:
         self.scanner = scanner
         self.update_current_token()
         self.stack = []
+        self.anystack = []
         self.root_nodes = {}
 
         #read data.json
@@ -75,48 +76,59 @@ class Parser:
             self.current_token_grammer = 'NUM'
         elif self.current_token_type == Type.SYMBOL:
             self.current_token_grammer = self.current_token_value
+            
+    def print_tree(self):
+        for pre, fill, node in RenderTree(self.anyroot):
+                    print("%s%s" % (pre, node.name))
 
     def parse(self):
         
         current_node = self.root_nodes['Program'] #TODO: get start node
         current_anynode = self.anyroot
         while True:
-            print(current_node)
             if current_node.is_terminal:
-                node = self.stack.pop()
-                current_node = node
-                for pre, fill, node in RenderTree(self.anyroot):
-                    print("%s%s" % (pre, node.name))
+                current_node = self.stack.pop()
+                current_anynode = self.anystack.pop()
+                self.print_tree()
                 continue
 
             else:
                 flag = False
                 for transition in current_node.transitions:
                     if transition in self.terminals and self.current_token_grammer == transition:
-                        print(transition)
-                        current_anynode = AnyNode(transition, parent=current_anynode)
                         current_node = current_node.get_next_node(transition)
+                        AnyNode(f'({self.current_token_type.value}, {self.current_token_value})',
+                                                  parent=current_anynode)
+                        # print(current_anynode)
+                        # print(self.anystack)
+                        # print("########################")
                         self.update_current_token()
                         flag = True
                         break
                     elif transition in self.non_terminals and self.current_token_grammer in self.firsts[transition]:
-                        current_anynode = AnyNode(transition, parent=current_anynode)
                         stack_node = current_node.get_next_node(transition)
                         self.stack.append(stack_node)
                         current_node = self.root_nodes[transition]
+                        
+                        self.anystack.append(current_anynode)
+                        current_anynode = AnyNode(transition, parent=current_anynode)
                         flag = True
                         break
                     elif transition in self.non_terminals and EPSILON in self.firsts[transition] and self.current_token_grammer in self.follows[transition]:
-                        current_anynode = AnyNode(transition, parent=current_anynode)
                         stack_node = current_node.get_next_node(transition)
                         self.stack.append(stack_node)
                         current_node = self.root_nodes[transition]
+                        
+                        self.anystack.append(current_anynode)
+                        current_anynode = AnyNode(transition, parent=current_anynode)
                         flag = True
                         break
                 if flag == True:
                     continue
                 if EPSILON in current_node.transitions:
                     current_node = self.stack.pop()
+                    AnyNode('epsilon', parent=current_anynode)
+                    current_anynode = self.anystack.pop()
                     continue 
 
 
