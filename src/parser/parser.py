@@ -86,56 +86,81 @@ class Parser:
         return file_str.strip()
         
     def parse(self):
-        
+        syntax_errors = ''
         current_node = self.root_nodes['Program'] #TODO: get start node
         current_anynode = self.anyroot
         while True:
-            if self.current_token_grammer == '$' and current_node.tree_value == 'Program':
-                AnyNode('$', parent=current_anynode)
-                break
-                
-            if current_node.is_terminal:
-                
+            
+            if current_node.is_terminal and current_node.tree_value != 'Program':
                 current_node = self.stack.pop()
                 current_anynode = self.anystack.pop()
                 continue
-
-            else:
-                flag = False
-                for transition in current_node.transitions:
-                    if transition in self.terminals and self.current_token_grammer == transition:
-                        current_node = current_node.get_next_node(transition)
-                        AnyNode(f'({self.current_token_type.value}, {self.current_token_value})',
-                                                  parent=current_anynode)
-                        self.update_current_token()
-                        flag = True
-                        break
-                    elif transition in self.non_terminals and self.current_token_grammer in self.firsts[transition]:
-                        stack_node = current_node.get_next_node(transition)
-                        self.stack.append(stack_node)
-                        current_node = self.root_nodes[transition]
-                        
-                        self.anystack.append(current_anynode)
-                        current_anynode = AnyNode(transition, parent=current_anynode)
-                        flag = True
-                        break
-                    elif transition in self.non_terminals and EPSILON in self.firsts[transition] and self.current_token_grammer in self.follows[transition]:
-                        stack_node = current_node.get_next_node(transition)
-                        self.stack.append(stack_node)
-                        current_node = self.root_nodes[transition]
-                        
-                        self.anystack.append(current_anynode)
-                        current_anynode = AnyNode(transition, parent=current_anynode)
-                        flag = True
-                        break
-                if flag == True:
-                    continue
-                if EPSILON in current_node.transitions:
-                    current_node = self.stack.pop()
-                    AnyNode('epsilon', parent=current_anynode)
-                    current_anynode = self.anystack.pop()
-                    continue 
-        return self.print_tree()
+            
+            
+            if self.current_token_grammer == '$':
+                if current_node.tree_value == 'Program':
+                    AnyNode('$', parent=current_anynode)
+                    break
+                elif EPSILON not in self.firsts[current_node.tree_value]:
+                    syntax_errors += f'syntax error, Unexpected EOF'
+                    break
+                
+                
+                
+            
+            flag = False
+            for transition in current_node.transitions:
+                if transition in self.terminals and self.current_token_grammer == transition:
+                    current_node = current_node.get_next_node(transition)
+                    AnyNode(f'({self.current_token_type.value}, {self.current_token_value})',
+                                              parent=current_anynode)
+                    self.update_current_token()
+                    flag = True
+                    break
+                elif transition in self.non_terminals and self.current_token_grammer in self.firsts[transition]:
+                    stack_node = current_node.get_next_node(transition)
+                    self.stack.append(stack_node)
+                    current_node = self.root_nodes[transition]
+                    
+                    self.anystack.append(current_anynode)
+                    current_anynode = AnyNode(transition, parent=current_anynode)
+                    flag = True
+                    break
+                elif transition in self.non_terminals and EPSILON in self.firsts[transition] and self.current_token_grammer in self.follows[transition]:
+                    stack_node = current_node.get_next_node(transition)
+                    self.stack.append(stack_node)
+                    current_node = self.root_nodes[transition]
+                    
+                    self.anystack.append(current_anynode)
+                    current_anynode = AnyNode(transition, parent=current_anynode)
+                    flag = True
+                    break
+            if flag == True:
+                continue
+            if EPSILON in current_node.transitions:
+                current_node = self.stack.pop()
+                AnyNode('epsilon', parent=current_anynode)
+                current_anynode = self.anystack.pop()
+                continue
+            if transition in  self.terminals and self.current_token_grammer != transition:
+                syntax_errors += f'syntax error, missing {transition}\n'
+                current_node = current_node.transitions[transition]
+                print(syntax_errors)
+            elif self.current_token_grammer not in self.follows[current_node.tree_value]:
+                syntax_errors += f'syntax error, illegal {self.current_token_grammer}\n'
+                self.update_current_token()
+                print(syntax_errors)
+            elif self.current_token_grammer in self.follows[current_node.tree_value]:
+                syntax_errors += f'syntax error, missing {current_node.tree_value}\n'
+                current_node = self.stack.pop()
+                print(syntax_errors)
+                
+                
+                    
+                
+                
+                
+        return self.print_tree(), syntax_errors.strip()
         
 
                 
