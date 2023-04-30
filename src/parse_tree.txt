@@ -1,13 +1,36 @@
 Program
-└── Declaration-list
-    ├── Declaration
-    │   ├── Declaration-initial
-    │   │   ├── Type-specifier
-    │   │   │   └── (KEYWORD, int)
-    │   │   └── (ID, func)
-    │   ├── Declaration-prime
-    │   │   └── Fun-declaration-prime
-    │   │       └── (SYMBOL, ()
-    │   └── Declaration-list
-    │       └── epsilon
-    └── $
+├── Declaration-list
+│   ├── Declaration
+│   │   ├── Declaration-initial
+│   │   │   ├── Type-specifier
+│   │   │   │   └── (KEYWORD, int)
+│   │   │   └── (ID, func)
+│   │   └── Declaration-prime
+│   │       └── Fun-declaration-prime
+│   │           ├── (SYMBOL, ()
+│   │           ├── Params
+│   │           └── Compound-stmt
+│   │               ├── Declaration-list
+│   │               │   └── epsilon
+│   │               └── Statement-list
+│   │                   ├── Statement
+│   │                   │   └── Expression-stmt
+│   │                   │       └── Expression
+│   │                   │           ├── (ID, a)
+│   │                   │           └── B
+│   │                   │               └── Simple-expression-prime
+│   │                   │                   ├── Additive-expression-prime
+│   │                   │                   │   ├── Term-prime
+│   │                   │                   │   │   ├── Factor-prime
+│   │                   │                   │   │   │   └── epsilon
+│   │                   │                   │   │   └── G
+│   │                   │                   │   │       └── epsilon
+│   │                   │                   │   └── D
+│   │                   │                   │       └── epsilon
+│   │                   │                   └── C
+│   │                   │                       └── epsilon
+│   │                   └── Statement-list
+│   │                       └── epsilon
+│   └── Declaration-list
+│       └── epsilon
+└── $

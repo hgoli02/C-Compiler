@@ -31,6 +31,9 @@ class Parser:
             f.close()
 
         self.build_tree(grammer_input)
+        print(self.root_nodes)
+        self.root_ids = [self.root_nodes[node].get_id() for node in self.root_nodes]
+        
 
 
     def parse(self):
@@ -91,7 +94,7 @@ class Parser:
         current_anynode = self.anyroot
         while True:
             
-            if current_node.is_terminal and current_node.tree_value != 'Program':
+            if current_node.is_terminal and self.stack: # TODO check stack empty
                 current_node = self.stack.pop()
                 current_anynode = self.anystack.pop()
                 continue
@@ -105,11 +108,16 @@ class Parser:
                     syntax_errors += f'syntax error, Unexpected EOF'
                     break
                 
-                
-                
-            
-            flag = False
+            flag = False          
             for transition in current_node.transitions:
+                if len(current_node.transitions.keys()) == 1 and transition in self.non_terminals:
+                    stack_node = current_node.get_next_node(transition)
+                    self.stack.append(stack_node)
+                    current_node = self.root_nodes[transition]
+                    self.anystack.append(current_anynode)
+                    current_anynode = AnyNode(transition, parent=current_anynode)
+                    flag = True
+                    break             
                 if transition in self.terminals and self.current_token_grammer == transition:
                     current_node = current_node.get_next_node(transition)
                     AnyNode(f'({self.current_token_type.value}, {self.current_token_value})',
@@ -142,7 +150,7 @@ class Parser:
                 AnyNode('epsilon', parent=current_anynode)
                 current_anynode = self.anystack.pop()
                 continue
-            if transition in  self.terminals and self.current_token_grammer != transition:
+            if transition in self.terminals and self.current_token_grammer != transition:
                 syntax_errors += f'syntax error, missing {transition}\n'
                 current_node = current_node.transitions[transition]
                 print(syntax_errors)
