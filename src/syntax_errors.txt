@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #5 : syntax error, missing Declaration-prime
 #6 : syntax error, illegal }
 #8 : syntax error, illegal void
@@ -37,3 +38,22 @@
 #16 : syntax error, illegal ID
 #16 : syntax error, missing ;
 #16 : syntax error, illegal )
+=======
+<<<<<<< HEAD
+syntax error, illegal ID
+syntax error, missing Params
+syntax error, missing (
+syntax error, missing )
+syntax error, missing ;
+syntax error, missing Return-stmt-prime
+syntax error, missing )
+=======
+#3 : syntax error, illegal ID
+#3 : syntax error, missing Params
+#4 : syntax error, missing (
+#4 : syntax error, missing )
+#6 : syntax error, missing ;
+#8 : syntax error, missing Return-stmt-prime
+#15 : syntax error, missing )
+>>>>>>> 551b89bf01b9c4aef780b36b1aa915ef967435e3
+>>>>>>> e8520bcf9c5916f8f66d2592bf8e8f99d554f9c6

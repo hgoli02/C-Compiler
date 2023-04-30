@@ -33,7 +33,6 @@ class Parser:
 
         self.build_tree(grammer_input)
         self.root_ids = [self.root_nodes[node].get_id() for node in self.root_nodes]
-        
 
 
     def parse(self):
@@ -112,7 +111,7 @@ class Parser:
                 
             flag = False          
             for transition in current_node.transitions:
-                if len(current_node.transitions.keys()) == 1 and transition in self.non_terminals:
+                if current_node.get_id() not in self.root_ids and transition in self.non_terminals:
                     stack_node = current_node.get_next_node(transition)
                     self.stack.append(stack_node)
                     current_node = self.root_nodes[transition]
@@ -151,6 +150,7 @@ class Parser:
                 AnyNode('epsilon', parent=current_anynode)
                 current_anynode = self.anystack.pop()
                 continue
+<<<<<<< HEAD
             else:
                 if current_node.get_id() not in self.root_ids and transition in self.terminals and self.current_token_grammer != transition:
                     current_node = current_node.get_next_node(transition)
@@ -167,10 +167,23 @@ class Parser:
                     syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, missing {current_node.tree_value}\n'
                     current_node = self.stack.pop()
                     print(syntax_errors)
+=======
+            if current_node.get_id() not in self.root_ids and transition in self.terminals and self.current_token_grammer != transition:
+                syntax_errors += f'syntax error, missing {transition}\n'
+                current_node = current_node.transitions[transition]
+                print(syntax_errors)
+            elif self.current_token_grammer not in self.follows[current_node.tree_value]:
+                syntax_errors += f'syntax error, illegal {self.current_token_grammer}\n'
+                self.update_current_token()
+                print(syntax_errors)
+            elif self.current_token_grammer in self.follows[current_node.tree_value]:
+                syntax_errors += f'syntax error, missing {current_node.tree_value}\n'
+                current_node = self.stack.pop()
+                print(syntax_errors)
+                
+                
+>>>>>>> e8520bcf9c5916f8f66d2592bf8e8f99d554f9c6
 
-                
-                    
-                
                 
                 
         return self.print_tree(), syntax_errors.strip()
