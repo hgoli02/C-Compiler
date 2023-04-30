@@ -1,6 +1,6 @@
 from scanner.scanner import Scanner
 from scanner.graph import *
-from parser.parser import Parser
+from parser import Parser
 
 def __main__():
     scanner = Scanner('input.txt')

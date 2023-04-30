@@ -18,7 +18,7 @@ class Parser:
         self.root_ids = []
 
         #read data.json
-        with open('parser/data.json', 'r') as f:
+        with open('data.json', 'r') as f:
             data = json.load(f)
             f.close()
         self.terminals = data['terminals']
@@ -27,7 +27,7 @@ class Parser:
         self.follows = data['follow']
         self.anyroot = AnyNode('Program')
 
-        with open('parser/grammer.txt', 'r') as f:
+        with open('grammer.txt', 'r') as f:
             grammer_input = f.read()
             f.close()
 
@@ -110,18 +110,7 @@ class Parser:
                     break
                 
             flag = False          
-            for transition in current_node.transitions:
-                if current_node.get_id() not in self.root_ids and transition in self.non_terminals:
-                    stack_node = current_node.get_next_node(transition)
-                    self.stack.append(stack_node)
-                    current_node = self.root_nodes[transition]
-                    self.anystack.append(current_anynode)
-                    
-                    if (self.current_token_grammer in self.firsts[current_node.tree_value] 
-                        or (EPSILON in self.firsts[current_node.tree_value] and self.current_token_grammer in self.follows[current_node.tree_value])):
-                        current_anynode = AnyNode(transition, parent=current_anynode)
-                    flag = True
-                    break             
+            for transition in current_node.transitions:       
                 if transition in self.terminals and self.current_token_grammer == transition:
                     current_node = current_node.get_next_node(transition)
                     AnyNode(f'({self.current_token_type.value}, {self.current_token_value})',
@@ -157,16 +146,16 @@ class Parser:
                     current_node = current_node.get_next_node(transition)
                     syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, missing {transition}\n'
                     print(syntax_errors)
-                elif self.current_token_grammer not in self.follows[current_node.tree_value]:
+                elif self.current_token_grammer not in self.follows[transition]:
                     syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, illegal {self.current_token_grammer}\n'
                     self.update_current_token()
                     if self.current_token_grammer == '$':
                         syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, Unexpected EOF'
                         break
                     print(syntax_errors)
-                elif self.current_token_grammer in self.follows[current_node.tree_value]:
-                    syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, missing {current_node.tree_value}\n'
-                    current_node = self.stack.pop()
+                elif self.current_token_grammer in self.follows[transition]:
+                    syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, missing {transition}\n'
+                    current_node = current_node.get_next_node(transition)
                     print(syntax_errors)
 
                 
