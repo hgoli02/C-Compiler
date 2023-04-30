@@ -32,7 +32,6 @@ class Parser:
             f.close()
 
         self.build_tree(grammer_input)
-        print(self.root_nodes)
         self.root_ids = [self.root_nodes[node].get_id() for node in self.root_nodes]
         
 
@@ -95,7 +94,8 @@ class Parser:
         current_node = self.root_nodes['Program'] #TODO: get start node
         current_anynode = self.anyroot
         while True:
-            
+            if self.current_token_grammer == '{':
+                pass
             if current_node.is_terminal and self.stack: # TODO check stack empty
                 current_node = self.stack.pop()
                 current_anynode = self.anystack.pop()
@@ -107,7 +107,7 @@ class Parser:
                     AnyNode('$', parent=current_anynode)
                     break
                 elif EPSILON not in self.firsts[current_node.tree_value]:
-                    syntax_errors += f'syntax error, Unexpected EOF'
+                    syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, Unexpected EOF'
                     break
                 
             flag = False          
@@ -117,6 +117,7 @@ class Parser:
                     self.stack.append(stack_node)
                     current_node = self.root_nodes[transition]
                     self.anystack.append(current_anynode)
+                    
                     current_anynode = AnyNode(transition, parent=current_anynode)
                     flag = True
                     break             
@@ -131,7 +132,6 @@ class Parser:
                     stack_node = current_node.get_next_node(transition)
                     self.stack.append(stack_node)
                     current_node = self.root_nodes[transition]
-                    
                     self.anystack.append(current_anynode)
                     current_anynode = AnyNode(transition, parent=current_anynode)
                     flag = True
@@ -140,26 +140,28 @@ class Parser:
                     stack_node = current_node.get_next_node(transition)
                     self.stack.append(stack_node)
                     current_node = self.root_nodes[transition]
-                    
                     self.anystack.append(current_anynode)
                     current_anynode = AnyNode(transition, parent=current_anynode)
                     flag = True
                     break
             if flag == True:
                 continue
-            if EPSILON in current_node.transitions:
+            if EPSILON in current_node.transitions and self.current_token_grammer in self.follows[current_node.tree_value]:
                 current_node = self.stack.pop()
                 AnyNode('epsilon', parent=current_anynode)
                 current_anynode = self.anystack.pop()
                 continue
             else:
                 if current_node.get_id() not in self.root_ids and transition in self.terminals and self.current_token_grammer != transition:
+                    current_node = current_node.get_next_node(transition)
                     syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, missing {transition}\n'
-                    current_node = current_node.transitions[transition]
                     print(syntax_errors)
                 elif self.current_token_grammer not in self.follows[current_node.tree_value]:
                     syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, illegal {self.current_token_grammer}\n'
                     self.update_current_token()
+                    if self.current_token_grammer == '$':
+                        syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, Unexpected EOF'
+                        break
                     print(syntax_errors)
                 elif self.current_token_grammer in self.follows[current_node.tree_value]:
                     syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, missing {current_node.tree_value}\n'
