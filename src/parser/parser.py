@@ -164,8 +164,7 @@ class Parser:
                 print(syntax_errors)
                 
                 
-                    
-                
+
                 
                 
         return self.print_tree(), syntax_errors.strip()

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 syntax error, illegal ID
 syntax error, missing Params
 syntax error, missing (
@@ -5,3 +6,12 @@ syntax error, missing )
 syntax error, missing ;
 syntax error, missing Return-stmt-prime
 syntax error, missing )
+=======
+#3 : syntax error, illegal ID
+#3 : syntax error, missing Params
+#4 : syntax error, missing (
+#4 : syntax error, missing )
+#6 : syntax error, missing ;
+#8 : syntax error, missing Return-stmt-prime
+#15 : syntax error, missing )
+>>>>>>> 551b89bf01b9c4aef780b36b1aa915ef967435e3
