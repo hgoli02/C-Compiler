@@ -15,6 +15,7 @@ class Parser:
         self.stack = []
         self.anystack = []
         self.root_nodes = {}
+        self.root_ids = []
 
         #read data.json
         with open('parser/data.json', 'r') as f:
@@ -52,6 +53,7 @@ class Parser:
             root = line[0].strip()
             children = line[1].split('|')
             self.root_nodes[root] = Node({}, root, False)
+            self.root_ids.append(self.root_nodes[root].get_id())
             for child in children:
                 child = child.strip()
                 transitions = child.split(' ')
@@ -150,7 +152,7 @@ class Parser:
                 AnyNode('epsilon', parent=current_anynode)
                 current_anynode = self.anystack.pop()
                 continue
-            if transition in self.terminals and self.current_token_grammer != transition:
+            if current_node.get_id() in self.root_ids and transition in self.terminals and self.current_token_grammer != transition:
                 syntax_errors += f'syntax error, missing {transition}\n'
                 current_node = current_node.transitions[transition]
                 print(syntax_errors)
