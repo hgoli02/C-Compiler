@@ -32,9 +32,7 @@ class Parser:
             f.close()
 
         self.build_tree(grammer_input)
-        print(self.root_nodes)
         self.root_ids = [self.root_nodes[node].get_id() for node in self.root_nodes]
-        
 
 
     def parse(self):
@@ -112,7 +110,7 @@ class Parser:
                 
             flag = False          
             for transition in current_node.transitions:
-                if len(current_node.transitions.keys()) == 1 and transition in self.non_terminals:
+                if current_node.get_id() not in self.root_ids and transition in self.non_terminals:
                     stack_node = current_node.get_next_node(transition)
                     self.stack.append(stack_node)
                     current_node = self.root_nodes[transition]
@@ -152,7 +150,7 @@ class Parser:
                 AnyNode('epsilon', parent=current_anynode)
                 current_anynode = self.anystack.pop()
                 continue
-            if current_node.get_id() in self.root_ids and transition in self.terminals and self.current_token_grammer != transition:
+            if current_node.get_id() not in self.root_ids and transition in self.terminals and self.current_token_grammer != transition:
                 syntax_errors += f'syntax error, missing {transition}\n'
                 current_node = current_node.transitions[transition]
                 print(syntax_errors)
