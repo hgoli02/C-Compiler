@@ -152,19 +152,20 @@ class Parser:
                 AnyNode('epsilon', parent=current_anynode)
                 current_anynode = self.anystack.pop()
                 continue
-            if current_node.get_id() in self.root_ids and transition in self.terminals and self.current_token_grammer != transition:
-                syntax_errors += f'syntax error, missing {transition}\n'
-                current_node = current_node.transitions[transition]
-                print(syntax_errors)
-            elif self.current_token_grammer not in self.follows[current_node.tree_value]:
-                syntax_errors += f'syntax error, illegal {self.current_token_grammer}\n'
-                self.update_current_token()
-                print(syntax_errors)
-            elif self.current_token_grammer in self.follows[current_node.tree_value]:
-                syntax_errors += f'syntax error, missing {current_node.tree_value}\n'
-                current_node = self.stack.pop()
-                print(syntax_errors)
-                
+            else:
+                if current_node.get_id() not in self.root_ids and transition in self.terminals and self.current_token_grammer != transition:
+                    syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, missing {transition}\n'
+                    current_node = current_node.transitions[transition]
+                    print(syntax_errors)
+                elif self.current_token_grammer not in self.follows[current_node.tree_value]:
+                    syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, illegal {self.current_token_grammer}\n'
+                    self.update_current_token()
+                    print(syntax_errors)
+                elif self.current_token_grammer in self.follows[current_node.tree_value]:
+                    syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, missing {current_node.tree_value}\n'
+                    current_node = self.stack.pop()
+                    print(syntax_errors)
+
                 
                     
                 
