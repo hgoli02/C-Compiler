@@ -112,13 +112,21 @@ class Parser:
             flag = False          
             for transition in current_node.transitions:
                 if current_node.get_id() not in self.root_ids and transition in self.non_terminals:
+                    
+                    if transition == 'G':
+                        print(self.print_tree())
+                    prev_firsts = self.firsts[transition]
                     stack_node = current_node.get_next_node(transition)
                     self.stack.append(stack_node)
                     current_node = self.root_nodes[transition]
                     self.anystack.append(current_anynode)
                     
+                    
                     if (self.current_token_grammer in self.firsts[current_node.tree_value] 
                         or (EPSILON in self.firsts[current_node.tree_value] and self.current_token_grammer in self.follows[current_node.tree_value])):
+                        current_anynode = AnyNode(transition, parent=current_anynode)
+                    if (not(self.current_token_grammer in self.firsts[current_node.tree_value] 
+                        or (EPSILON in self.firsts[current_node.tree_value] and self.current_token_grammer in self.follows[current_node.tree_value])) and EPSILON in prev_firsts):
                         current_anynode = AnyNode(transition, parent=current_anynode)
                     flag = True
                     break             
