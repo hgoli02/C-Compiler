@@ -8,7 +8,8 @@ class CodeGenerator:
         self.ss = semantic_stack()
         self.pb = ProgramBlock()
         self.memory = Memory()
-        self.actions = ['PNUM', 'PUSH_TYPE', 'PID', 'VAR_DEC', 'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL']
+        self.actions = ['PNUM', 'PUSH_TYPE', 'PID', 'VAR_DEC', 'ARR_ACC',
+         'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC']
     
     def run(self, type, current_token):
         #print("Code Gen executed")
@@ -33,6 +34,13 @@ class CodeGenerator:
             id = self.memory.find_addr(id)
             self.ss.pop(2)
             self.pb.add_code('ASSIGN', f'#0', f'{id}')  
+        elif type == 'ARRAY_DEC':
+            data_type = self.ss.get_top(1)   
+            id = self.ss.get_top()
+            self.memory.add_array(id, int(current_token))
+            id = self.memory.find_addr(id)
+            self.ss.pop(2)
+            self.pb.add_code('ASSIGN', f'#0', f'{id}') 
         elif type == 'ASSIGN':
             to_id = self.ss.get_top(1)
             from_id = self.ss.get_top()
@@ -44,12 +52,16 @@ class CodeGenerator:
                 operation = 'ADD'
             elif operation == '-':
                 operation = 'SUB'
+            elif operation == '<':
+                operation = 'LT'
+            elif operation == '==':
+                operation = 'EQ'
             else:
                 print(f'wtf is this: {operation}')
             self.ss.push(operation)
         elif type == 'ADD_SUB':
-            id1 = self.ss.get_top()
-            id2 = self.ss.get_top(2)
+            id1 = self.ss.get_top(2)
+            id2 = self.ss.get_top()
             operation = self.ss.get_top(1)
             self.ss.pop(3)
             t = self.memory.get_temp()
@@ -58,13 +70,31 @@ class CodeGenerator:
         elif type == 'MUL':
             id1 = self.ss.get_top()
             id2 = self.ss.get_top(1)
+            self.ss.pop(2)
             t = self.memory.get_temp()
-            self.pb.add_code('MUL', f'{id1}', f'{id2}', f'{t}')
+            self.pb.add_code('MULT', f'{id1}', f'{id2}', f'{t}')
             self.ss.push(t)
+        elif type == 'CMP':
+            id1 = self.ss.get_top(2)
+            id2 = self.ss.get_top(0)
+            operation = self.ss.get_top(1)
+            self.ss.pop(3)
+            t = self.memory.get_temp()
+            self.pb.add_code(operation, f'{id1}', f'{id2}', f'{t}')
+            self.ss.push(t)
+        elif type == 'ARR_ACC':
+            symbol = self.ss.get_top(1)
+            idx = self.ss.get_top()
+            self.ss.pop(2)
+            t = self.memory.get_temp()
+            self.pb.add_code("MULT", f'{idx}', f'#4', f'{t}')
+            self.pb.add_code("ADD", f'{t}', f'{symbol}', f'{t}')
+            self.ss.push(f'@{t}')
         elif type == 'OUTPUT':
             t = self.ss.get_top()
             self.ss.pop(1)
             self.pb.add_code('PRINT', f'{t}')
         
         print(f'stack: {self.ss.stack}')
-        print(f'memory: {self.memory.Data}')
+        self.pb.print_block()
+        print("************************************"*10)

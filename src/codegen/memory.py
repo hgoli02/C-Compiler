@@ -23,7 +23,7 @@ class Memory():
             return self.Data[input]
         else:
             #Throw an error
-            print("Error: variable not found")
+            # print("Error: variable not found")
             return None
     
     def add_var(self, input):
