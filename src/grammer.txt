@@ -12,7 +12,8 @@ Param -> Declaration-initial Param-prime
 Param-prime -> [ ] | EPSILON
 Compound-stmt -> { Declaration-list Statement-list }
 Statement-list -> Statement Statement-list | EPSILON
-Statement -> Expression-stmt | Compound-stmt | Selection-stmt | Iteration-stmt | Return-stmt
+Statement -> Expression-stmt | Compound-stmt | Selection-stmt | Iteration-stmt | Return-stmt | Output-stmt
+Output-stmt -> output ( Expression ) OUTPUT ;
 Expression-stmt -> Expression ; | break ; | ;
 Selection-stmt -> if ( Expression ) Statement else Statement
 Iteration-stmt -> repeat Statement until ( Expression )
@@ -33,7 +34,7 @@ Addop -> PUSHOP + | PUSHOP -
 Term -> Factor G
 Term-prime -> Factor-prime G
 Term-zegond -> Factor-zegond G
-G -> * Factor G | EPSILON
+G -> * Factor MUL G | EPSILON
 Factor -> ( Expression ) | ID Var-call-prime | PNUM NUM
 Var-call-prime -> ( Args ) | Var-prime
 Var-prime -> [ Expression ] | EPSILON
