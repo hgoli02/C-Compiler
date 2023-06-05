@@ -199,7 +199,7 @@ class Parser:
                     syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, missing {transition}\n'
                     current_node = current_node.get_next_node(transition)
 
-        self.code_gen.program_block.print_block()
+        self.code_gen.pb.print_block()
         return self.print_tree(), syntax_errors
         
 

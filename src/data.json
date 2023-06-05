@@ -18,6 +18,7 @@
         "repeat",
         "until",
         "return",
+        "output",
         "=",
         "<",
         "==",
@@ -44,6 +45,7 @@
         "Expression-stmt",
         "Selection-stmt",
         "Iteration-stmt",
+        "Output-stmt",
         "Return-stmt",
         "Return-stmt-prime",
         "Expression",
@@ -107,6 +109,7 @@
             "[", "EPSILON"
         ],
         "Compound-stmt": ["{"],
+        "Output-stmt": ["output"],
         "Statement-list": [
             "ID",
             ";",
@@ -117,6 +120,7 @@
             "if",
             "repeat",
             "return",
+            "output",
             "EPSILON"
         ],
         "Statement": [
@@ -128,7 +132,8 @@
             "break",
             "if",
             "repeat",
-            "return"
+            "return",
+            "output"
         ],
         "Expression-stmt": [
             "ID",
@@ -251,6 +256,7 @@
             "if",
             "repeat",
             "return",
+            "output",
             "$"
         ],
         "Declaration": [
@@ -266,6 +272,7 @@
             "if",
             "repeat",
             "return",
+            "output",
             "$"
         ],
         "Declaration-initial": [
@@ -288,6 +295,7 @@
             "if",
             "repeat",
             "return",
+            "output",
             "$"
         ],
         "Var-declaration-prime": [
@@ -303,6 +311,7 @@
             "if",
             "repeat",
             "return",
+            "output",
             "$"
         ],
         "Fun-declaration-prime": [
@@ -318,6 +327,7 @@
             "if",
             "repeat",
             "return",
+            "output",
             "$"
         ],
         "Type-specifier": ["ID"],
@@ -344,6 +354,7 @@
             "repeat",
             "until",
             "return",
+            "output",
             "$"
         ],
         "Statement-list": ["}"],
@@ -361,7 +372,25 @@
             "else",
             "repeat",
             "until",
-            "return"
+            "return",
+            "output"
+        ],
+        "Output-stmt": [
+            "ID",
+            ";",
+            "NUM",
+            "(",
+            "int",
+            "void",
+            "{",
+            "}",
+            "break",
+            "if",
+            "else",
+            "repeat",
+            "until",
+            "return",
+            "output"
         ],
         "Expression-stmt": [
             "ID",
@@ -377,6 +406,7 @@
             "else",
             "repeat",
             "until",
+            "output",
             "return"
         ],
         "Selection-stmt": [
@@ -393,6 +423,7 @@
             "else",
             "repeat",
             "until",
+            "output",
             "return"
         ],
         "Iteration-stmt": [
@@ -409,6 +440,7 @@
             "else",
             "repeat",
             "until",
+            "output",
             "return"
         ],
         "Return-stmt": [
@@ -425,6 +457,7 @@
             "else",
             "repeat",
             "until",
+            "output",
             "return"
         ],
         "Return-stmt-prime": [
@@ -441,6 +474,7 @@
             "else",
             "repeat",
             "until",
+            "output",
             "return"
         ],
         "Expression": [

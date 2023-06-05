@@ -127,40 +127,24 @@ Program
 │   │               │           │       └── (SYMBOL, ;)
 │   │               │           └── Statement-list
 │   │               │               ├── Statement
-│   │               │               │   └── Expression-stmt
+│   │               │               │   └── Output-stmt
+│   │               │               │       ├── (KEYWORD, output)
+│   │               │               │       ├── (SYMBOL, ()
 │   │               │               │       ├── Expression
-│   │               │               │       │   ├── (ID, output)
+│   │               │               │       │   ├── (ID, c)
 │   │               │               │       │   └── B
 │   │               │               │       │       └── Simple-expression-prime
 │   │               │               │       │           ├── Additive-expression-prime
 │   │               │               │       │           │   ├── Term-prime
 │   │               │               │       │           │   │   ├── Factor-prime
-│   │               │               │       │           │   │   │   ├── (SYMBOL, ()
-│   │               │               │       │           │   │   │   ├── Args
-│   │               │               │       │           │   │   │   │   └── Arg-list
-│   │               │               │       │           │   │   │   │       ├── Expression
-│   │               │               │       │           │   │   │   │       │   ├── (ID, c)
-│   │               │               │       │           │   │   │   │       │   └── B
-│   │               │               │       │           │   │   │   │       │       └── Simple-expression-prime
-│   │               │               │       │           │   │   │   │       │           ├── Additive-expression-prime
-│   │               │               │       │           │   │   │   │       │           │   ├── Term-prime
-│   │               │               │       │           │   │   │   │       │           │   │   ├── Factor-prime
-│   │               │               │       │           │   │   │   │       │           │   │   │   └── epsilon
-│   │               │               │       │           │   │   │   │       │           │   │   └── G
-│   │               │               │       │           │   │   │   │       │           │   │       └── epsilon
-│   │               │               │       │           │   │   │   │       │           │   └── D
-│   │               │               │       │           │   │   │   │       │           │       └── epsilon
-│   │               │               │       │           │   │   │   │       │           └── C
-│   │               │               │       │           │   │   │   │       │               └── epsilon
-│   │               │               │       │           │   │   │   │       └── Arg-list-prime
-│   │               │               │       │           │   │   │   │           └── epsilon
-│   │               │               │       │           │   │   │   └── (SYMBOL, ))
+│   │               │               │       │           │   │   │   └── epsilon
 │   │               │               │       │           │   │   └── G
 │   │               │               │       │           │   │       └── epsilon
 │   │               │               │       │           │   └── D
 │   │               │               │       │           │       └── epsilon
 │   │               │               │       │           └── C
 │   │               │               │       │               └── epsilon
+│   │               │               │       ├── (SYMBOL, ))
 │   │               │               │       └── (SYMBOL, ;)
 │   │               │               └── Statement-list
 │   │               │                   └── epsilon

@@ -9,7 +9,7 @@ definite_symbols = set([*';:,[](){}+-<'])
 all_symbols = set([*';:,[](){}+-<=*'])
 whitespace = set([' ', '\n', '\r', '\t', '\v', '\f'])
 language = set([*digits, *letters, *all_symbols, *whitespace, 'eof'])
-keywords = set(['if', 'else', 'void', 'int', 'repeat', 'break', 'until', 'return'])
+keywords = set(['if', 'else', 'void', 'int', 'repeat', 'break', 'until', 'return', 'output'])
 
 class Type(Enum):
     NUMBER = 'NUM'

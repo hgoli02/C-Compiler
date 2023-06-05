@@ -23,19 +23,16 @@ class CodeGenerator:
             self.ss.push(data_type)
         elif type == 'PID':
             id = current_token
-            self.ss.push(id)
             addr = self.memory.find_addr(id)
             id = addr if addr is not None else id
-            self.semantic_stack.push(id)
+            self.ss.push(id)
         elif type == 'VAR_DEC':
             data_type = self.ss.get_top(1)   
             id = self.ss.get_top()
             self.memory.add_var(id)
+            id = self.memory.find_addr(id)
             self.ss.pop(2)
             self.pb.add_code('ASSIGN', f'#0', f'{id}')  
-            id = self.memory.find_addr(id)
-            self.semantic_stack.pop(2)
-            self.program_block.add_code('ASSIGN', f'#0', f'{id}')  
         elif type == 'ASSIGN':
             to_id = self.ss.get_top(1)
             from_id = self.ss.get_top()
@@ -43,13 +40,13 @@ class CodeGenerator:
             self.pb.add_code('ASSIGN', f'{from_id}', f'{to_id}')      
         elif type == 'PUSHOP':
             operation = current_token
-            self.ss.push(operation)
             if operation == "+":
                 operation = 'ADD'
             elif operation == '-':
                 operation = 'SUB'
             else:
                 print(f'wtf is this: {operation}')
+            self.ss.push(operation)
         elif type == 'ADD_SUB':
             id1 = self.ss.get_top()
             id2 = self.ss.get_top(2)
@@ -57,11 +54,13 @@ class CodeGenerator:
             self.ss.pop(3)
             t = self.memory.get_temp()
             self.pb.add_code(operation, f'{id1}', f'{id2}', f'{t}')  
+            self.ss.push(t)
         elif type == 'MUL':
             id1 = self.ss.get_top()
             id2 = self.ss.get_top(1)
             t = self.memory.get_temp()
             self.pb.add_code('MUL', f'{id1}', f'{id2}', f'{t}')
+            self.ss.push(t)
         elif type == 'OUTPUT':
             t = self.ss.get_top()
             self.ss.pop(1)
