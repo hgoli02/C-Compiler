@@ -1,6 +1,7 @@
 from anytree import Node as AnyNode, RenderTree
 from scanner.scanner import Scanner
 from scanner.graph import Type
+from codegen.codegen import CodeGenerator
 EPSILON = 'EPSILON'
 import anytree
 import json
@@ -16,6 +17,9 @@ class Parser:
         self.anystack = []
         self.root_nodes = {}
         self.root_ids = []
+        self.flag_code_gen = False
+        self.code_gen_type = None
+        self.code_gen = CodeGenerator()
 
         #read data.json
         with open('data.json', 'r') as f:
@@ -34,6 +38,11 @@ class Parser:
         self.build_tree(grammer_input)
         self.root_ids = [self.root_nodes[node].get_id() for node in self.root_nodes]
 
+    def reset_code_gen(self):
+        self.flag_code_gen = False
+    
+    def set_code_gen(self):
+        self.flag_code_gen = True
 
     def parse(self):
         self.program()
@@ -109,8 +118,21 @@ class Parser:
                     break
                 
             flag = False          
-            for transition in current_node.transitions:       
+            for transition in current_node.transitions:     
+                self.reset_code_gen()
+                #checking if transition is code gen action
+                if transition in self.code_gen.actions:
+                    self.code_gen_type = transition
+                    #get the next transition of the next node
+                    transition = current_node.get_next_node(transition).transitions.keys()[0]
+                    self.flag_code_gen = True
+
+
                 if transition in self.terminals and self.current_token_grammer == transition:
+                    if self.flag_code_gen:
+                        self.code_gen.run(self.code_gen_type)
+                        self.flag_code_gen = False
+
                     current_node = current_node.get_next_node(transition)
                     AnyNode(f'({self.current_token_type.value}, {self.current_token_value})',
                                               parent=current_anynode)
@@ -118,6 +140,11 @@ class Parser:
                     flag = True
                     break
                 elif transition in self.non_terminals and self.current_token_grammer in self.firsts[transition]:
+                    #run code gen
+                    if self.flag_code_gen:
+                        self.code_gen.run(self.code_gen_type)
+                        self.flag_code_gen = False
+
                     stack_node = current_node.get_next_node(transition)
                     self.stack.append(stack_node)
                     current_node = self.root_nodes[transition]
@@ -126,6 +153,11 @@ class Parser:
                     flag = True
                     break
                 elif transition in self.non_terminals and EPSILON in self.firsts[transition] and self.current_token_grammer in self.follows[transition]:
+                    #run code gen
+                    if self.flag_code_gen:
+                        self.code_gen.run(self.code_gen_type)
+                        self.flag_code_gen = False
+
                     stack_node = current_node.get_next_node(transition)
                     self.stack.append(stack_node)
                     current_node = self.root_nodes[transition]
