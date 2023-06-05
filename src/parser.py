@@ -69,7 +69,6 @@ class Parser:
         self.current_token_value = self.current_token[1]
         self.current_token_grammer = self.current_token_type
 
-        print(f"updating current token: {self.current_token_value}")
         if self.current_token_type == Type.KEYWORD:
             self.current_token_grammer = self.current_token_value
         elif self.current_token_type == Type.IDENTIFIER:
@@ -106,7 +105,7 @@ class Parser:
                     AnyNode('$', parent=current_anynode)
                     break
                 elif EPSILON not in self.firsts[current_node.tree_value]:
-                    syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, Unexpected EOF'
+                    syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, Unexpected EOF\n'
                     break
                 
             flag = False          
@@ -145,22 +144,17 @@ class Parser:
                 if current_node.get_id() not in self.root_ids and transition in self.terminals and self.current_token_grammer != transition:
                     current_node = current_node.get_next_node(transition)
                     syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, missing {transition}\n'
-                    print(syntax_errors)
                 elif self.current_token_grammer not in self.follows[transition]:
                     syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, illegal {self.current_token_grammer}\n'
                     self.update_current_token()
                     if self.current_token_grammer == '$':
-                        syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, Unexpected EOF'
+                        syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, Unexpected EOF\n'
                         break
-                    print(syntax_errors)
                 elif self.current_token_grammer in self.follows[transition]:
                     syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, missing {transition}\n'
                     current_node = current_node.get_next_node(transition)
-                    print(syntax_errors)
 
-                
-                
-        return self.print_tree(), syntax_errors.strip()
+        return self.print_tree(), syntax_errors
         
 
                 
