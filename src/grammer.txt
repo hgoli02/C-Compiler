@@ -34,11 +34,11 @@ Term -> Factor G
 Term-prime -> Factor-prime G
 Term-zegond -> Factor-zegond G
 G -> * Factor G | EPSILON
-Factor -> ( Expression ) | ID Var-call-prime | NUM
+Factor -> ( Expression ) | ID Var-call-prime | PNUM NUM
 Var-call-prime -> ( Args ) | Var-prime
 Var-prime -> [ Expression ] | EPSILON
 Factor-prime -> ( Args ) | EPSILON
-Factor-zegond -> ( Expression ) | NUM
+Factor-zegond -> ( Expression ) | PNUM NUM
 Args -> Arg-list | EPSILON
 Arg-list -> Expression Arg-list-prime
 Arg-list-prime -> , Expression Arg-list-prime | EPSILON

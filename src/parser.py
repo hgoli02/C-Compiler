@@ -43,11 +43,6 @@ class Parser:
     
     def set_code_gen(self):
         self.flag_code_gen = True
-
-    def parse(self):
-        self.program()
-        if self.current_token_type != Type.EOF:
-            self.error()
             
     def build_tree(self, inputs):
         """
@@ -88,13 +83,23 @@ class Parser:
             self.current_token_grammer = self.current_token_value
         elif self.current_token_value == "eof":
             self.current_token_grammer = '$'
-            
+        #print updated token
+        #print(f"current token: {self.current_token}")
+
     def print_tree(self):
         file_str = ''
         for pre, _, node in RenderTree(self.anyroot):
             file_str += "%s%s" % (pre, node.name) + '\n'
             
         return file_str.strip()
+
+    def update_code_gen(self, current_node):
+        #run code gen
+        if self.flag_code_gen:
+            self.code_gen.run(self.code_gen_type, self.current_token_value)
+            self.flag_code_gen = False
+            #move to next node and token
+            return current_node.get_next_node(self.code_gen_type)
         
     def parse(self):
         syntax_errors = ''
@@ -124,14 +129,23 @@ class Parser:
                 if transition in self.code_gen.actions:
                     self.code_gen_type = transition
                     #get the next transition of the next node
-                    transition = current_node.get_next_node(transition).transitions.keys()[0]
+                    next_node = current_node.get_next_node(transition)
+                    #get first transition of next node
+                    if not next_node.is_terminal:
+                        transition = list(next_node.transitions.keys())[0]
+                    else:
+                        self.code_gen.run(self.code_gen_type, self.current_token_value)
+                        flag = True
+                        current_node = next_node
+                        break
                     self.flag_code_gen = True
 
 
                 if transition in self.terminals and self.current_token_grammer == transition:
+                    #run code gen
                     if self.flag_code_gen:
-                        self.code_gen.run(self.code_gen_type)
-                        self.flag_code_gen = False
+                        current_node = self.update_code_gen(current_node)
+                    
 
                     current_node = current_node.get_next_node(transition)
                     AnyNode(f'({self.current_token_type.value}, {self.current_token_value})',
@@ -142,8 +156,7 @@ class Parser:
                 elif transition in self.non_terminals and self.current_token_grammer in self.firsts[transition]:
                     #run code gen
                     if self.flag_code_gen:
-                        self.code_gen.run(self.code_gen_type)
-                        self.flag_code_gen = False
+                        current_node = self.update_code_gen(current_node)
 
                     stack_node = current_node.get_next_node(transition)
                     self.stack.append(stack_node)
@@ -155,8 +168,7 @@ class Parser:
                 elif transition in self.non_terminals and EPSILON in self.firsts[transition] and self.current_token_grammer in self.follows[transition]:
                     #run code gen
                     if self.flag_code_gen:
-                        self.code_gen.run(self.code_gen_type)
-                        self.flag_code_gen = False
+                        current_node = self.update_code_gen(current_node)
 
                     stack_node = current_node.get_next_node(transition)
                     self.stack.append(stack_node)
@@ -186,6 +198,7 @@ class Parser:
                     syntax_errors += f'#{self.scanner.reader.get_lineno()} : syntax error, missing {transition}\n'
                     current_node = current_node.get_next_node(transition)
 
+        self.code_gen.program_block.print_block()
         return self.print_tree(), syntax_errors
         
 

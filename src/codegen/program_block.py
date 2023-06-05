@@ -13,3 +13,7 @@ class ProgramBlock:
     def add_empty_block(self):
         self.line += 1
 
+    def print_block(self):
+        for i in range(self.line):
+            print(self.codes[i])
+
