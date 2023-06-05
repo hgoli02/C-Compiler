@@ -85,6 +85,7 @@ class Parser:
             self.current_token_grammer = '$'
         #print updated token
         #print(f"current token: {self.current_token}")
+      
 
     def print_tree(self):
         file_str = ''

@@ -4,16 +4,17 @@ class ProgramBlock:
         self.codes = [None] * 2000
         self.line = 0
         
-    def add_code(self, opcode, oper1='', oper2='', oper3=''):
+    def add_code(self, opcode, oper1='\t', oper2='\t', oper3='\t'):
         self.codes[self.line] = f"({opcode}, {oper1}, {oper2}, {oper3})"
+        self.line += 1
 
-    def set_instruction(self, index, opcode, oper1='', oper2='', oper3=''):
+    def set_instruction(self, index, opcode, oper1='\t', oper2='\t', oper3='\t'):
         self.codes[index] = f"({opcode}, {oper1}, {oper2}, {oper3})"
 
     def add_empty_block(self):
         self.line += 1
 
     def print_block(self):
-        for i in range(self.line):
+        for i in range(self.line + 1):
             print(self.codes[i])
 

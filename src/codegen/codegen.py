@@ -12,7 +12,7 @@ class CodeGenerator:
     
     def run(self, type, current_token):
         #print("Code Gen executed")
-        print(f'type: {type}, current_token: {current_token}')
+        #print(f'type: {type}, current_token: {current_token}')
         if type == 'PNUM':
             number = current_token
             t = self.memory.get_temp()
@@ -24,12 +24,18 @@ class CodeGenerator:
         elif type == 'PID':
             id = current_token
             self.ss.push(id)
+            addr = self.memory.find_addr(id)
+            id = addr if addr is not None else id
+            self.semantic_stack.push(id)
         elif type == 'VAR_DEC':
             data_type = self.ss.get_top(1)   
             id = self.ss.get_top()
             self.memory.add_var(id)
             self.ss.pop(2)
             self.pb.add_code('ASSIGN', f'#0', f'{id}')  
+            id = self.memory.find_addr(id)
+            self.semantic_stack.pop(2)
+            self.program_block.add_code('ASSIGN', f'#0', f'{id}')  
         elif type == 'ASSIGN':
             to_id = self.ss.get_top(1)
             from_id = self.ss.get_top()

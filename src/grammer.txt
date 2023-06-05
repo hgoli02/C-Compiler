@@ -29,13 +29,13 @@ Relop -> < | ==
 Additive-expression -> Term D
 Additive-expression-prime -> Term-prime D
 Additive-expression-zegond -> Term-zegond D
-D -> Addop Term ADD_SUB D | EPSILON
-Addop -> PUSHOP + | PUSHOP -
+D -> PUSHOP Addop Term ADD_SUB D | EPSILON
+Addop -> + | -
 Term -> Factor G
 Term-prime -> Factor-prime G
 Term-zegond -> Factor-zegond G
 G -> * Factor MUL G | EPSILON
-Factor -> ( Expression ) | ID Var-call-prime | PNUM NUM
+Factor -> ( Expression ) | PID ID Var-call-prime | PNUM NUM
 Var-call-prime -> ( Args ) | Var-prime
 Var-prime -> [ Expression ] | EPSILON
 Factor-prime -> ( Args ) | EPSILON
