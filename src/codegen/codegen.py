@@ -10,7 +10,7 @@ class CodeGenerator:
         self.memory = Memory()
         self.loop_stack = []
         self.actions = ['PNUM', 'PUSH_TYPE', 'PID', 'VAR_DEC', 'ARR_ACC', 'LABEL', 'UNTIL', 'BREAK',
-         'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC', 'SAVE', 'JPF_SAVE', 'JP', 'PUSH_ASSIGN']
+         'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC', 'SAVE', 'JPF_SAVE', 'JP', 'PUSH_ASSIGN','BREAK']
     
     def run(self, type, current_token):
         #print("Code Gen executed")
