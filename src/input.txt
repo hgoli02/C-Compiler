@@ -15,22 +15,4 @@ void main(void)
 	a[0] = a[0]*b[0];
 	a[1] = a[1]+b[1];
 
-	i = 0;
-	repeat{
-    output(a[i]);
-    i = i + 1;
-    }
-	until(1 < i)
-
-	k = 10;
-	repeat{
-    if(k == 6){
-        break;
-    }
-    else{
-        output(k+1);
-        k = k - 1;
-    }
-    }
-    until(k < 0)
 }

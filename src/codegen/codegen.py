@@ -10,7 +10,7 @@ class CodeGenerator:
         self.memory = Memory()
         self.loop_stack = []
         self.actions = ['PNUM', 'PUSH_TYPE', 'PID', 'VAR_DEC', 'ARR_ACC', 'LABEL', 'UNTIL', 'BREAK',
-         'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC', 'SAVE', 'JPF_SAVE', 'JP', 'PUSH_ASSIGN','BREAK']
+         'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC', 'SAVE', 'JPF_SAVE', 'JP', 'PUSH_ASSIGN']
     
     def run(self, type, current_token):
         #print("Code Gen executed")
@@ -100,7 +100,7 @@ class CodeGenerator:
             idx = self.pb.get_line()
             self.ss.push(idx)
         elif type == 'BREAK':
-            idx = self.pb.add_empty_block()s
+            idx = self.pb.add_empty_block()
             self.loop_stack.append(idx)
         elif type == 'UNTIL':
             cond = self.ss.get_top()
