@@ -9,7 +9,7 @@ class CodeGenerator:
         self.pb = ProgramBlock()
         self.memory = Memory()
         self.actions = ['PNUM', 'PUSH_TYPE', 'PID', 'VAR_DEC', 'ARR_ACC', 'LABEL', 'UNTIL',
-         'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC']
+         'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC', 'SAVE', 'JPF_SAVE', 'JP']
     
     def run(self, type, current_token):
         #print("Code Gen executed")
@@ -98,6 +98,22 @@ class CodeGenerator:
             idx = self.ss.get_top(1)
             self.ss.pop(2)
             self.pb.add_code('JPF', f'{cond}', f'{idx}')
+        elif type == 'SAVE':
+            idx = self.pb.add_empty_block()
+            self.ss.push(idx)
+        elif type == 'JPF_SAVE': #SAVE #JPF
+            idx = self.ss.get_top()
+            cond = self.ss.get_top(1)
+            self.ss.pop(2)
+            i = self.pb.get_line()
+            self.ss.push(i)
+            self.pb.add_empty_block()
+            self.pb.set_instruction(idx, 'JPF', f'{cond}', f'{i + 1}')
+        elif type == 'JP':
+            idx = self.ss.get_top()
+            i = self.pb.get_line()
+            self.pb.set_instruction(idx, 'JP', f'{i}')
+            self.ss.pop()
         elif type == 'OUTPUT':
             t = self.ss.get_top()
             self.ss.pop(1)

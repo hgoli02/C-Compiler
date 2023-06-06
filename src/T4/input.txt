@@ -10,7 +10,7 @@ void main(void) {
      arr[6] = 3;
      arr[9] = 5;
      var1 = 2;
-	 arr[2] = 25;
+	arr[2] = 25;
      output(arr[var1]);
      output(1234);
      output(arr[arr[arr[arr[0] - 1] + 1] - 1]);
