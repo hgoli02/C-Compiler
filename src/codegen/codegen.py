@@ -137,8 +137,8 @@ class CodeGenerator:
 
     def get_printed_code(self):
         out_str = ''
-        for line in self.pb.codes:
+        for i, line in enumerate(self.pb.codes):
             if line is None:
                 break
-            out_str += line + '\n'
+            out_str += f'{i}\t{line}\n'
         return out_str
