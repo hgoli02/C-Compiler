@@ -6,19 +6,15 @@ import sys
 def __main__():
     scanner = Scanner('input.txt')
     parser = Parser(scanner)
-    parse_tree, syntax_errors = parser.parse()
-    print(syntax_errors)
-
-    if not syntax_errors:
-        syntax_errors = 'There is no syntax error.'
-    
-    with open("parse_tree.txt", 'w', encoding='utf-8') as f:
-        f.write(parse_tree)
+    generated_code = parser.parse()
+    #write to output.txt
+    with open('output.txt', 'w') as f:
+        f.write(generated_code)
         f.close()
-    
-    with open("syntax_errors.txt", 'w') as g:
-        g.write(syntax_errors)
-        g.close()
+    with open('semantic_errors.txt', 'w') as f:
+        out = 'The input program is semantically correct.'
+        f.write(out)
+        f.close()
 
 
 if __name__ == '__main__':

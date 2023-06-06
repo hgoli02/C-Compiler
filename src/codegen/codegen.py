@@ -98,3 +98,11 @@ class CodeGenerator:
         print(f'stack: {self.ss.stack}')
         self.pb.print_block()
         print("************************************"*10)
+
+    def get_printed_code(self):
+        out_str = ''
+        for line in self.pb.codes:
+            if line is None:
+                break
+            out_str += line + '\n'
+        return out_str

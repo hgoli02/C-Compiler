@@ -200,7 +200,7 @@ class Parser:
                     current_node = current_node.get_next_node(transition)
 
         self.code_gen.pb.print_block()
-        return self.print_tree(), syntax_errors
+        return self.code_gen.get_printed_code()
         
 
                 
