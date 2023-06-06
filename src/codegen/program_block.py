@@ -13,6 +13,10 @@ class ProgramBlock:
 
     def add_empty_block(self):
         self.line += 1
+        return self.line - 1
+    
+    def get_line(self):
+        return self.line
 
     def print_block(self):
         for i in range(self.line):
