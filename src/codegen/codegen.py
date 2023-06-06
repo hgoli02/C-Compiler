@@ -8,7 +8,7 @@ class CodeGenerator:
         self.ss = semantic_stack()
         self.pb = ProgramBlock()
         self.memory = Memory()
-        self.actions = ['PNUM', 'PUSH_TYPE', 'PID', 'VAR_DEC', 'ARR_ACC',
+        self.actions = ['PNUM', 'PUSH_TYPE', 'PID', 'VAR_DEC', 'ARR_ACC', 'LABEL', 'UNTIL',
          'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC']
     
     def run(self, type, current_token):
@@ -90,6 +90,14 @@ class CodeGenerator:
             self.pb.add_code("MULT", f'{idx}', f'#4', f'{t}')
             self.pb.add_code("ADD", f'{t}', f'{symbol}', f'{t}')
             self.ss.push(f'@{t}')
+        elif type == 'LABEL':
+            idx = self.pb.get_line()
+            self.ss.push(idx)
+        elif type == 'UNTIL':
+            cond = self.ss.get_top()
+            idx = self.ss.get_top(1)
+            self.ss.pop(2)
+            self.pb.add_code('JPF', f'{cond}', f'{idx}')
         elif type == 'OUTPUT':
             t = self.ss.get_top()
             self.ss.pop(1)
