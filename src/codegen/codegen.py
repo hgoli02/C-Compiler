@@ -94,7 +94,7 @@ class CodeGenerator:
             self.ss.pop(2)
             t = self.memory.get_temp()
             self.pb.add_code("MULT", f'{idx}', f'#4', f'{t}')
-            self.pb.add_code("ADD", f'{t}', f'{symbol}', f'{t}')
+            self.pb.add_code("ADD", f'{t}', f'#{symbol}', f'{t}')
             self.ss.push(f'@{t}')
         elif type == 'LABEL':
             idx = self.pb.get_line()
