@@ -8,8 +8,9 @@ class CodeGenerator:
         self.ss = semantic_stack()
         self.pb = ProgramBlock()
         self.memory = Memory()
-        self.actions = ['PNUM', 'PUSH_TYPE', 'PID', 'VAR_DEC', 'ARR_ACC', 'LABEL', 'UNTIL',
-         'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC', 'SAVE', 'JPF_SAVE', 'JP']
+        self.loop_stack = []
+        self.actions = ['PNUM', 'PUSH_TYPE', 'PID', 'VAR_DEC', 'ARR_ACC', 'LABEL', 'UNTIL', 'BREAK',
+         'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC', 'SAVE', 'JPF_SAVE', 'JP', 'PUSH_ASSIGN','BREAK']
     
     def run(self, type, current_token):
         #print("Code Gen executed")
@@ -42,10 +43,15 @@ class CodeGenerator:
             self.ss.pop(2)
             self.pb.add_code('ASSIGN', f'#0', f'{id}') 
         elif type == 'ASSIGN':
-            to_id = self.ss.get_top(1)
+            to_id = self.ss.get_top(2)
+            op = self.ss.get_top(3)
             from_id = self.ss.get_top()
-            self.ss.pop(2)
-            self.pb.add_code('ASSIGN', f'{from_id}', f'{to_id}')      
+            self.ss.pop(3)
+            self.pb.add_code('ASSIGN', f'{from_id}', f'{to_id}') 
+            if op == '=':
+                self.ss.push(from_id)
+        elif type == 'PUSH_ASSIGN':
+            self.ss.push(current_token)     
         elif type == 'PUSHOP':
             operation = current_token
             if operation == "+":
@@ -93,11 +99,17 @@ class CodeGenerator:
         elif type == 'LABEL':
             idx = self.pb.get_line()
             self.ss.push(idx)
+        elif type == 'BREAK':
+            idx = self.pb.add_empty_block()s
+            self.loop_stack.append(idx)
         elif type == 'UNTIL':
             cond = self.ss.get_top()
             idx = self.ss.get_top(1)
             self.ss.pop(2)
             self.pb.add_code('JPF', f'{cond}', f'{idx}')
+            if len(self.loop_stack) > 0:
+                idx = self.loop_stack.pop()
+                self.pb.set_instruction(idx,'JP', f'{self.pb.get_line()}')
         elif type == 'SAVE':
             idx = self.pb.add_empty_block()
             self.ss.push(idx)
