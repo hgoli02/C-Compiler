@@ -72,7 +72,6 @@ class Parser:
         self.current_token_type = self.current_token[0]
         self.current_token_value = self.current_token[1]
         self.current_token_grammer = self.current_token_type
-
         if self.current_token_type == Type.KEYWORD:
             self.current_token_grammer = self.current_token_value
         elif self.current_token_type == Type.IDENTIFIER:
@@ -97,7 +96,7 @@ class Parser:
     def update_code_gen(self, current_node):
         #run code gen
         if self.flag_code_gen:
-            self.code_gen.run(self.code_gen_type, self.current_token_value)
+            self.code_gen.run(self.code_gen_type, self.current_token_value, self.scanner.reader.get_lineno())
             self.flag_code_gen = False
             #move to next node and token
             return current_node.get_next_node(self.code_gen_type)
@@ -135,7 +134,7 @@ class Parser:
                     if not next_node.is_terminal:
                         transition = list(next_node.transitions.keys())[0]
                     else:
-                        self.code_gen.run(self.code_gen_type, self.current_token_value)
+                        self.code_gen.run(self.code_gen_type, self.current_token_value, self.scanner.reader.get_lineno())
                         flag = True
                         current_node = next_node
                         break
@@ -180,7 +179,17 @@ class Parser:
                     break
             if flag == True:
                 continue
-            if EPSILON in current_node.transitions and self.current_token_grammer in self.follows[current_node.tree_value]:
+            flag_epsilon = False
+            for transition in current_node.transitions:
+                if transition == EPSILON and self.current_token_grammer in self.follows[current_node.tree_value]:
+                    flag_epsilon = True
+                    #check if has next node after EPSILON
+                    epsilon_node = current_node.get_next_node(transition)
+                    if len(epsilon_node.transitions.items()) > 0:
+                        code_gen_type = list(epsilon_node.transitions.keys())[0]
+                        self.code_gen.run(code_gen_type, self.current_token_value, self.scanner.reader.get_lineno())
+                        flag_epsilon = True
+            if flag_epsilon:
                 current_node = self.stack.pop()
                 AnyNode('epsilon', parent=current_anynode)
                 current_anynode = self.anystack.pop()
@@ -200,7 +209,7 @@ class Parser:
                     current_node = current_node.get_next_node(transition)
 
         self.code_gen.pb.print_block()
-        return self.code_gen.get_printed_code()
+        return self.code_gen.get_printed_code(), self.code_gen.semantic_errors
         
 
                 

@@ -9,12 +9,13 @@ class CodeGenerator:
         self.pb = ProgramBlock()
         self.memory = Memory()
         self.loop_stack = []
-        self.actions = ['PNUM', 'PUSH_TYPE', 'PID', 'VAR_DEC', 'ARR_ACC', 'LABEL', 'UNTIL', 'BREAK',
-         'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC', 'SAVE', 'JPF_SAVE', 'JP', 'PUSH_ASSIGN','BREAK']
+        self.semantic_errors = []
+        self.actions = ['PNUM', 'PUSH_TYPE', 'PID', 'VAR_DEC', 'ARR_ACC', 'LABEL', 'UNTIL', 'BREAK', 'PID_DEC', 'FUN_DEC',
+         'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC', 'SAVE', 'JPF_SAVE', 'JP', 'PUSH_ASSIGN','BREAK','ARR_DEC_PARAM', 'RETURN']
     
-    def run(self, type, current_token):
+    def run(self, type, current_token, current_line):
         #print("Code Gen executed")
-        #print(f'type: {type}, current_token: {current_token}')
+        print(f'type: {type}, current_token: {current_token}')
         if type == 'PNUM':
             number = current_token
             t = self.memory.get_temp()
@@ -24,12 +25,38 @@ class CodeGenerator:
             data_type = current_token
             self.ss.push(data_type)
         elif type == 'PID':
+            if self.memory.find_addr(current_token) is None:
+                self.semantic_errors.append(f'#{current_line}: Semantic Error! \'{current_token}\' is not defined.')
+                self.ss.push("SEMANTIC PID")
+                return
+            id = current_token
+            addr = self.memory.find_addr(id)
+            self.ss.push(addr)
+        elif type == 'PID_DEC':
             id = current_token
             addr = self.memory.find_addr(id)
             id = addr if addr is not None else id
             self.ss.push(id)
         elif type == 'VAR_DEC':
-            data_type = self.ss.get_top(1)   
+            data_type = self.ss.get_top(1)
+            ## soomantic
+            if data_type != 'int':
+                self.semantic_errors.append(f'#{current_line}: Semantic Error! Illegal type of void for \'{self.ss.get_top()}\'.')
+                self.ss.pop(1)
+                return                               
+            ## end soomantic
+            id = self.ss.get_top()
+            self.memory.add_var(id)
+            id = self.memory.find_addr(id)
+            self.ss.pop(2)
+            self.pb.add_code('ASSIGN', f'#0', f'{id}')  
+        elif type == 'FUN_DEC':
+            data_type = self.ss.get_top(1)
+            ## soomantic
+            if data_type != 'int':
+                self.ss.pop(1)
+                return                               
+            ## end soomantic
             id = self.ss.get_top()
             self.memory.add_var(id)
             id = self.memory.find_addr(id)
@@ -42,6 +69,11 @@ class CodeGenerator:
             id = self.memory.find_addr(id)
             self.ss.pop(2)
             self.pb.add_code('ASSIGN', f'#0', f'{id}') 
+        elif type == 'ARR_DEC_PARAM':
+            data_type = self.ss.get_top(1)   
+            id = self.ss.get_top()
+            self.memory.add_array(id, 1)
+            self.ss.pop(2)
         elif type == 'ASSIGN':
             to_id = self.ss.get_top(2)
             op = self.ss.get_top(3)
@@ -67,9 +99,17 @@ class CodeGenerator:
             self.ss.push(operation)
         elif type == 'ADD_SUB':
             id1 = self.ss.get_top(2)
-            id2 = self.ss.get_top()
             operation = self.ss.get_top(1)
+            id2 = self.ss.get_top()
             self.ss.pop(3)
+            if self.memory.find_type(self.memory.find_var(id1)) == 'array':
+                self.semantic_errors.append(f'#{current_line}: Semantic Error! Type mismatch in operands, Got array instead of int.')
+                self.ss.push("SEMANTIC SUB_ADD")
+                return
+            if self.memory.find_type(self.memory.find_var(id2)) == 'array':
+                self.semantic_errors.append(f'#{current_line}: Semantic Error! Type mismatch in operands, Got array instead of int.')
+                self.ss.push("SEMANTIC SUB_ADD")
+                return
             t = self.memory.get_temp()
             self.pb.add_code(operation, f'{id1}', f'{id2}', f'{t}')  
             self.ss.push(t)
@@ -130,6 +170,8 @@ class CodeGenerator:
             t = self.ss.get_top()
             self.ss.pop(1)
             self.pb.add_code('PRINT', f'{t}')
+        elif type == 'RETURN':
+            t = self.ss.pop() #TODO: NEXT PHASE
         
         print(f'stack: {self.ss.stack}')
         self.pb.print_block()

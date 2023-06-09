@@ -4,12 +4,12 @@ Declaration -> Declaration-initial Declaration-prime
 Declaration-initial -> Type-specifier ID
 Declaration-prime -> Fun-declaration-prime | Var-declaration-prime
 Var-declaration-prime -> VAR_DEC ; | [ ARRAY_DEC NUM ] ;
-Fun-declaration-prime -> ( Params ) Compound-stmt
-Type-specifier -> PUSH_TYPE int PID | void
-Params -> int ID Param-prime Param-list | void
+Fun-declaration-prime -> FUN_DEC ( Params ) Compound-stmt
+Type-specifier -> PUSH_TYPE int PID_DEC | void PID_DEC
+Params -> PUSH_TYPE int PID_DEC ID Param-prime Param-list | void
 Param-list -> , Param Param-list | EPSILON
 Param -> Declaration-initial Param-prime
-Param-prime -> [ ] | EPSILON
+Param-prime -> [ ] ARR_DEC_PARAM | EPSILON VAR_DEC
 Compound-stmt -> { Declaration-list Statement-list }
 Statement-list -> Statement Statement-list | EPSILON
 Statement -> Expression-stmt | Compound-stmt | Selection-stmt | Iteration-stmt | Return-stmt | Output-stmt
@@ -17,7 +17,7 @@ Output-stmt -> output ( Expression ) OUTPUT ;
 Expression-stmt -> Expression ; | break BREAK ; | ;
 Selection-stmt -> if ( Expression ) SAVE Statement JPF_SAVE else Statement JP
 Iteration-stmt -> repeat LABEL Statement until ( Expression ) UNTIL
-Return-stmt -> return Return-stmt-prime
+Return-stmt -> return Return-stmt-prime RETURN
 Return-stmt-prime -> ; | Expression ;
 Expression -> Simple-expression-zegond | PID ID B
 B -> PUSH_ASSIGN = Expression ASSIGN | [ Expression ] ARR_ACC H | Simple-expression-prime
