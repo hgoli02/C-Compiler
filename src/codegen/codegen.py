@@ -61,11 +61,11 @@ class CodeGenerator:
             if self.scope == 'main':
                 self.pb.set_instruction(0, 'JP', self.pb.get_line())
 
-            self.memory.add_function(self.scope, self.pb.get_line())
-
             if data_type != 'int':
+                self.memory.add_function(self.scope, self.pb.get_line(), 'void')
                 self.ss.pop(1)
-            else:                              
+            else:   
+                self.memory.add_function(self.scope, self.pb.get_line(), 'int')                           
                 id = self.ss.get_top()
                 self.ss.pop(2)  
 
@@ -207,12 +207,14 @@ class CodeGenerator:
         elif type == 'FUN_END_CALL':
             self.memory.reset_param()
             fun_addr = self.ss.get_top()
+            self.ss.pop()
             self.pb.add_code('ASSIGN', '#' + str(self.pb.get_line() + 2), '3000')
             self.pb.add_code('JP', str(fun_addr))
             temp = self.memory.get_temp()
-            self.pb.add_code('ASSIGN', '2000', f'{temp}')
-            self.ss.pop()
-            self.ss.push(temp)
+            func_ret = self.memory.get_function_type_with_line(fun_addr)
+            if func_ret == 'int':
+                self.pb.add_code('ASSIGN', '2000', f'{temp}')
+                self.ss.push(temp)
 
         print(f'stack: {self.ss.stack}')
         self.pb.print_block()

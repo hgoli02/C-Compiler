@@ -13,6 +13,7 @@ class Memory():
         self.Data = defaultdict(dict)
         self.DataType = defaultdict(dict)
         self.functions = defaultdict(str)
+        self.function_type = defaultdict(str)
         self.data_pointer = 100
         self.temp_pointer = 500
         self.param_pointer = 1000
@@ -76,8 +77,14 @@ class Memory():
             self.DataType[func][input] = 'array'
             self.data_pointer += 4*size
     
-    def add_function(self, input, line):
+    def add_function(self, input, line, type):
         self.functions[input] = line
+        self.function_type[input] = type
     
     def get_function_line(self, input):
         return self.functions[input]
+
+    def get_function_type_with_line(self, input):
+        for k, v in self.functions.items():
+            if v == input:
+                return self.function_type[k]

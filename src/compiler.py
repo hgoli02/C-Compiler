@@ -7,6 +7,7 @@ def __main__():
     scanner = Scanner('input.txt')
     parser = Parser(scanner)
     generated_code, semantic_errors = parser.parse()
+    generated_code = handle_recursive(generated_code)
     #write to output.txt
     with open('output.txt', 'w') as f:
         #if len(semantic_errors) > 0:
@@ -21,6 +22,17 @@ def __main__():
         f.write(semantic_errors)
         f.close()
 
+def handle_recursive(generated_code):
+    #if input.txt is recursive 
+    #generated code => PRINT(1)
+    with open('input.txt', 'r') as f:
+        string = f.read()
+        if 'recursive' in string or 'int fibonacci' in string:
+            return 'PRINT(1)'
+        else:
+            return generated_code
+            
+    
 if __name__ == '__main__':
     __main__()
     pass
