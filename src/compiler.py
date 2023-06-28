@@ -9,8 +9,8 @@ def __main__():
     generated_code, semantic_errors = parser.parse()
     #write to output.txt
     with open('output.txt', 'w') as f:
-        if len(semantic_errors) > 0:
-            generated_code = 'The output code has not been generated.'
+        #if len(semantic_errors) > 0:
+        #    generated_code = 'The output code has not been generated.'
         f.write(generated_code)
         f.close()
     with open('semantic_errors.txt', 'w') as f:
@@ -20,7 +20,6 @@ def __main__():
             semantic_errors = '\n'.join(semantic_errors)
         f.write(semantic_errors)
         f.close()
-
 
 if __name__ == '__main__':
     __main__()

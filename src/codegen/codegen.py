@@ -10,8 +10,12 @@ class CodeGenerator:
         self.memory = Memory()
         self.loop_stack = []
         self.semantic_errors = []
-        self.actions = ['PNUM', 'PUSH_TYPE', 'PID', 'VAR_DEC', 'ARR_ACC', 'LABEL', 'UNTIL', 'BREAK', 'PID_DEC', 'FUN_DEC',
-         'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC', 'SAVE', 'JPF_SAVE', 'JP', 'PUSH_ASSIGN','BREAK','ARR_DEC_PARAM', 'RETURN']
+        self.scope = 'global'
+        self.actions = ['PNUM', 'PUSH_TYPE', 'PID', 'VAR_DEC', 'ARR_ACC', 'LABEL', 'UNTIL', 'BREAK', 'PID_DEC', 'FUN_DEC', 'VAR_DEC_PARAM',
+         'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC', 'SAVE', 'JPF_SAVE'
+         , 'JP', 'PUSH_ASSIGN','BREAK','ARR_DEC_PARAM', 'RETURN', 'FUN_END','RETURN_VOID', 'ASSIGN_ARG', 'FUN_END_CALL']
+         
+        self.fun_dec_signal = (False, 0)
     
     def run(self, type, current_token, current_line):
         #print("Code Gen executed")
@@ -25,16 +29,17 @@ class CodeGenerator:
             data_type = current_token
             self.ss.push(data_type)
         elif type == 'PID':
-            if self.memory.find_addr(current_token) is None:
-                self.semantic_errors.append(f'#{current_line}: Semantic Error! \'{current_token}\' is not defined.')
-                self.ss.push("SEMANTIC PID")
-                return
             id = current_token
-            addr = self.memory.find_addr(id)
+            addr = self.memory.find_addr(id, self.scope)
+            if addr is None:
+                addr = self.memory.get_function_line(id)
+            if addr is None:
+                self.ss.push('SEMANTIC PID')
+                return
             self.ss.push(addr)
         elif type == 'PID_DEC':
             id = current_token
-            addr = self.memory.find_addr(id)
+            addr = self.memory.find_addr(id, self.scope)
             id = addr if addr is not None else id
             self.ss.push(id)
         elif type == 'VAR_DEC':
@@ -46,34 +51,51 @@ class CodeGenerator:
                 return                               
             ## end soomantic
             id = self.ss.get_top()
-            self.memory.add_var(id)
-            id = self.memory.find_addr(id)
+            self.memory.add_var(id, self.scope)
+            id = self.memory.find_addr(id, self.scope)
             self.ss.pop(2)
             self.pb.add_code('ASSIGN', f'#0', f'{id}')  
         elif type == 'FUN_DEC':
             data_type = self.ss.get_top(1)
-            ## soomantic
+            self.scope = self.ss.get_top()
+            if self.scope == 'main':
+                self.pb.set_instruction(0, 'JP', self.pb.get_line())
+
+            self.memory.add_function(self.scope, self.pb.get_line())
+
             if data_type != 'int':
                 self.ss.pop(1)
-                return                               
-            ## end soomantic
-            id = self.ss.get_top()
-            self.memory.add_var(id)
-            id = self.memory.find_addr(id)
-            self.ss.pop(2)
-            self.pb.add_code('ASSIGN', f'#0', f'{id}')  
+            else:                              
+                id = self.ss.get_top()
+                self.ss.pop(2)  
+
+
         elif type == 'ARRAY_DEC':
             data_type = self.ss.get_top(1)   
             id = self.ss.get_top()
-            self.memory.add_array(id, int(current_token))
-            id = self.memory.find_addr(id)
+            self.memory.add_array(id, int(current_token), self.scope)
+            id = self.memory.find_addr(id, self.scope)
             self.ss.pop(2)
             self.pb.add_code('ASSIGN', f'#0', f'{id}') 
+
         elif type == 'ARR_DEC_PARAM':
             data_type = self.ss.get_top(1)   
             id = self.ss.get_top()
-            self.memory.add_array(id, 1)
             self.ss.pop(2)
+            self.memory.add_array(id, 1, self.scope)
+            idx = self.memory.find_addr(id, self.scope)
+            self.pb.add_code('ASSIGN', f'{self.memory.get_param()}', f'{idx}')
+
+        elif type == 'VAR_DEC_PARAM':
+            data_type = self.ss.get_top(1)   
+            id = self.ss.get_top()
+            self.ss.pop(2)
+            self.memory.add_var(id, self.scope)
+            idx = self.memory.find_addr(id, self.scope)
+            self.pb.add_code('ASSIGN', f'{self.memory.get_param()}', f'{idx}')
+        elif type == 'FUN_END':
+            self.memory.reset_param()
+            
         elif type == 'ASSIGN':
             to_id = self.ss.get_top(2)
             op = self.ss.get_top(3)
@@ -102,11 +124,11 @@ class CodeGenerator:
             operation = self.ss.get_top(1)
             id2 = self.ss.get_top()
             self.ss.pop(3)
-            if self.memory.find_type(self.memory.find_var(id1)) == 'array':
+            if self.memory.find_type(self.memory.find_var(id1, self.scope), self.scope) == 'array':
                 self.semantic_errors.append(f'#{current_line}: Semantic Error! Type mismatch in operands, Got array instead of int.')
                 self.ss.push("SEMANTIC SUB_ADD")
                 return
-            if self.memory.find_type(self.memory.find_var(id2)) == 'array':
+            if self.memory.find_type(self.memory.find_var(id2, self.scope), self.scope) == 'array':
                 self.semantic_errors.append(f'#{current_line}: Semantic Error! Type mismatch in operands, Got array instead of int.')
                 self.ss.push("SEMANTIC SUB_ADD")
                 return
@@ -171,8 +193,27 @@ class CodeGenerator:
             self.ss.pop(1)
             self.pb.add_code('PRINT', f'{t}')
         elif type == 'RETURN':
-            t = self.ss.pop() #TODO: NEXT PHASE
-        
+            id = self.ss.get_top()
+            t = self.ss.pop()
+            self.pb.add_code("ASSIGN", f'{id}', f'{2000}')
+            self.pb.add_code("JP", '@3000')
+        elif type == 'RETURN_VOID':
+            self.pb.add_code("JP", '@3000')
+        elif type == 'ASSIGN_ARG':
+            id = self.ss.get_top()
+            param_addr = self.memory.get_param()
+            self.pb.add_code('ASSIGN', id, param_addr)
+            self.ss.pop()
+        elif type == 'FUN_END_CALL':
+            self.memory.reset_param()
+            fun_addr = self.ss.get_top()
+            self.pb.add_code('ASSIGN', '#' + str(self.pb.get_line() + 2), '3000')
+            self.pb.add_code('JP', str(fun_addr))
+            temp = self.memory.get_temp()
+            self.pb.add_code('ASSIGN', '2000', f'{temp}')
+            self.ss.pop()
+            self.ss.push(temp)
+
         print(f'stack: {self.ss.stack}')
         self.pb.print_block()
         print("************************************"*10)
