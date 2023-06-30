@@ -14,7 +14,7 @@ Compound-stmt -> { Declaration-list Statement-list }
 Statement-list -> Statement Statement-list | EPSILON
 Statement -> Expression-stmt | Compound-stmt | Selection-stmt | Iteration-stmt | Return-stmt | Output-stmt
 Output-stmt -> output ( Expression ) OUTPUT ;
-Expression-stmt -> Expression ; | break BREAK ; | ;
+Expression-stmt -> POP_STACK Expression ; | break BREAK ; | ;
 Selection-stmt -> if ( Expression ) SAVE Statement JPF_SAVE else Statement JP
 Iteration-stmt -> repeat LABEL Statement until ( Expression ) UNTIL
 Return-stmt -> return Return-stmt-prime

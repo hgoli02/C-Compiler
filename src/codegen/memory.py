@@ -57,13 +57,9 @@ class Memory():
             return None
 
     def add_var(self, input, func):
-        if input in self.Data:
-            #Throw an error
-            print("Error: variable already exists")
-        else:
-            self.Data[func][input] = self.data_pointer
-            self.DataType[func][input] = 'var'
-            self.data_pointer += 4
+        self.Data[func][input] = self.data_pointer
+        self.DataType[func][input] = 'var'
+        self.data_pointer += 4
     
     def find_var(self, input, func):
         #loop through memroy to find the variable

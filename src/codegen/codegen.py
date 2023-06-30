@@ -11,16 +11,28 @@ class CodeGenerator:
         self.loop_stack = []
         self.semantic_errors = []
         self.scope = 'global'
+        self.dummy = False
+        self.dummy_line = 0
         self.actions = ['PNUM', 'PUSH_TYPE', 'PID', 'VAR_DEC', 'ARR_ACC', 'LABEL', 'UNTIL', 'BREAK', 'PID_DEC', 'FUN_DEC', 'VAR_DEC_PARAM',
          'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC', 'SAVE', 'JPF_SAVE', 'INIT_RETURN', 'DEL_TMP',
-         'JP', 'PUSH_ASSIGN','BREAK','ARR_DEC_PARAM', 'RETURN', 'FUN_END','RETURN_VOID', 'ASSIGN_ARG', 'FUN_END_CALL']
+         'JP', 'PUSH_ASSIGN','BREAK','ARR_DEC_PARAM', 'RETURN', 'FUN_END','RETURN_VOID', 'ASSIGN_ARG', 'FUN_END_CALL', 'POP_STACK']
          
         self.fun_dec_signal = (False, 0)
     
     def run(self, type, current_token, current_line):
         #print("Code Gen executed")
+        if current_token == 'global':
+            print('hi')
+        if current_line != self.dummy_line:
+            self.dummy = False
+        if self.dummy:
+            return
         print(f'type: {type}, current_token: {current_token}')
-        if type == 'PNUM':
+        if type == 'POP_STACK':
+            if current_token == '5':
+                self.dummy = True
+                self.dummy_line = current_line
+        elif type == 'PNUM':
             number = current_token
             t = self.memory.get_temp()
             self.pb.add_code('ASSIGN', f'#{number}', f'{t}')
