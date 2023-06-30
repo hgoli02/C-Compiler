@@ -21,6 +21,7 @@ class CodeGenerator:
     
     def run(self, type, current_token, current_line):
         #print("Code Gen executed")
+        print(current_line)
         if current_token == 'global':
             print('hi')
         if current_line != self.dummy_line:
@@ -29,7 +30,7 @@ class CodeGenerator:
             return
         print(f'type: {type}, current_token: {current_token}')
         if type == 'POP_STACK':
-            if current_token == '5':
+            if current_token.isnumeric():
                 self.dummy = True
                 self.dummy_line = current_line
         elif type == 'PNUM':
@@ -51,7 +52,7 @@ class CodeGenerator:
             self.ss.push(addr)
         elif type == 'PID_DEC':
             id = current_token
-            addr = self.memory.find_addr(id, self.scope)
+            addr = self.memory.find_addr_only_scope(id, self.scope)
             id = addr if addr is not None else id
             self.ss.push(id)
         elif type == 'VAR_DEC':

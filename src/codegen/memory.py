@@ -47,7 +47,14 @@ class Memory():
             #Throw an error
             # print("Error: variable not found")
             return None
-    
+    def find_addr_only_scope(self, input, func):
+        if input in self.Data[func]:
+            return self.Data[func][input]          
+        else:
+            #Throw an error
+            # print("Error: variable not found")
+            return None    
+            
     def find_type(self, input, func):
         if input in self.DataType[func]:
             return self.DataType[func][input]
