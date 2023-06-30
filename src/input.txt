@@ -1,21 +1,39 @@
-int fibonacci (int n)  
-{  
-    if (n==0)  
-    {  
-    return 0;  
-    }  
-    else if (n == 1)  
-    {  
-        return 1;   
-    }  
-    else  
-    {  
-        return fibonacci(n-1)+fibonacci(n-2);  
-    }  
-}  
+/* === Test Case 8 === */
+int arr[3];
+int global;
 
-void main(void)
-{
-     output(fibonacci(6));
+int foo(int arr[], int param) {
+	if (arr[1] == 0) {
+		return param + 100;
+	} else {
+		return global + 200;
+	} 
 }
 
+void changeglobal(int param) {
+	if (param < 5) {
+		global = 3;
+		return;
+	} else {
+		5;
+	} 
+	global = 6;
+}
+
+void main(void) {
+	int global;
+	int arr1[4];
+    int m;
+	
+	changeglobal(5);
+	global = 1;
+	arr1[1] = 1;
+	arr[1] = 0;
+    m = foo(arr1, 7);
+	output(m);  
+	
+	changeglobal(4);
+	
+	output(foo(arr1, 7));  
+	output(foo(arr, 7));  
+}

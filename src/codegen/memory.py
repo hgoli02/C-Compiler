@@ -14,16 +14,24 @@ class Memory():
         self.DataType = defaultdict(dict)
         self.functions = defaultdict(str)
         self.function_type = defaultdict(str)
+        self.fun_to_addr = defaultdict(str)
         self.data_pointer = 100
-        self.temp_pointer = 500
+        self.temp_pointer = 3100
         self.param_pointer = 1000
+        self.return_pointer = 3000
+        
         
 
     def get_temp(self):
         self.temp_pointer += 4
         return self.temp_pointer - 4
+    
+    def add_return_function(self, input):
+        self.fun_to_addr[input] = self.return_pointer
+        self.return_pointer += 4
 
     def get_param(self):
+
         self.param_pointer += 4
         return self.param_pointer - 4
 
@@ -65,16 +73,35 @@ class Memory():
         for key, value in self.Data['global'].items():
             if value == input:
                 return key
-        return None
-        
+        return None 
+    
+    def get_data_type(self, input , scope):
+        var = None
+        for key, value in self.Data[scope].items():
+            if value == input:
+                var = key
+                break
+        if var is not None:
+            return self.DataType[scope][var]
+        for key, value in self.Data['global'].items():
+            if value == input:
+                var = key
+                break
+        return self.DataType['global'][var]
 
-    def add_array(self, input, size, func):
+    def get_data_type_by_symbol(self, input, scope):
+        return self.DataType[scope][input]
+
+    def add_array(self, input, size, func, is_pointer=False):
         if input in self.Data:
             #Throw an error
             print("Error: variable already exists")
         else:
             self.Data[func][input] = self.data_pointer
-            self.DataType[func][input] = 'array'
+            if not is_pointer:
+                self.DataType[func][input] = 'array'
+            else:
+                self.DataType[func][input] = 'array-ptr'
             self.data_pointer += 4*size
     
     def add_function(self, input, line, type):
@@ -88,3 +115,11 @@ class Memory():
         for k, v in self.functions.items():
             if v == input:
                 return self.function_type[k]
+            
+    def get_function_name(self, input):
+        for k, v in self.functions.items():
+            if v == input:
+                return k
+            
+    def get_function_return_addr(self, input):
+        return self.fun_to_addr[input]

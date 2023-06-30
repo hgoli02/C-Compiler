@@ -12,8 +12,8 @@ class CodeGenerator:
         self.semantic_errors = []
         self.scope = 'global'
         self.actions = ['PNUM', 'PUSH_TYPE', 'PID', 'VAR_DEC', 'ARR_ACC', 'LABEL', 'UNTIL', 'BREAK', 'PID_DEC', 'FUN_DEC', 'VAR_DEC_PARAM',
-         'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC', 'SAVE', 'JPF_SAVE'
-         , 'JP', 'PUSH_ASSIGN','BREAK','ARR_DEC_PARAM', 'RETURN', 'FUN_END','RETURN_VOID', 'ASSIGN_ARG', 'FUN_END_CALL']
+         'ASSIGN', 'PUSHOP', 'ADD_SUB', 'OUTPUT', 'MUL', 'CMP', 'ARRAY_DEC', 'SAVE', 'JPF_SAVE', 'INIT_RETURN', 'DEL_TMP',
+         'JP', 'PUSH_ASSIGN','BREAK','ARR_DEC_PARAM', 'RETURN', 'FUN_END','RETURN_VOID', 'ASSIGN_ARG', 'FUN_END_CALL']
          
         self.fun_dec_signal = (False, 0)
     
@@ -58,6 +58,7 @@ class CodeGenerator:
         elif type == 'FUN_DEC':
             data_type = self.ss.get_top(1)
             self.scope = self.ss.get_top()
+            self.memory.add_return_function(self.scope)
             if self.scope == 'main':
                 self.pb.set_instruction(0, 'JP', self.pb.get_line())
 
@@ -82,7 +83,7 @@ class CodeGenerator:
             data_type = self.ss.get_top(1)   
             id = self.ss.get_top()
             self.ss.pop(2)
-            self.memory.add_array(id, 1, self.scope)
+            self.memory.add_array(id, 1, self.scope, True)
             idx = self.memory.find_addr(id, self.scope)
             self.pb.add_code('ASSIGN', f'{self.memory.get_param()}', f'{idx}')
 
@@ -156,7 +157,11 @@ class CodeGenerator:
             self.ss.pop(2)
             t = self.memory.get_temp()
             self.pb.add_code("MULT", f'{idx}', f'#4', f'{t}')
-            self.pb.add_code("ADD", f'{t}', f'#{symbol}', f'{t}')
+            datatype = self.memory.get_data_type(symbol, self.scope)
+            if datatype == 'array':
+                self.pb.add_code("ADD", f'{t}', f'#{symbol}', f'{t}')
+            else:
+                self.pb.add_code("ADD", f'{t}', f'{symbol}', f'{t}')
             self.ss.push(f'@{t}')
         elif type == 'LABEL':
             idx = self.pb.get_line()
@@ -196,26 +201,48 @@ class CodeGenerator:
             id = self.ss.get_top()
             t = self.ss.pop()
             self.pb.add_code("ASSIGN", f'{id}', f'{2000}')
-            self.pb.add_code("JP", '@3000')
+            
+            self.pb.add_code("JP", f'@{self.memory.get_function_return_addr(self.scope)}')
         elif type == 'RETURN_VOID':
-            self.pb.add_code("JP", '@3000')
+            self.pb.add_code("JP", f'@{self.memory.get_function_return_addr(self.scope)}')
         elif type == 'ASSIGN_ARG':
             id = self.ss.get_top()
             param_addr = self.memory.get_param()
-            self.pb.add_code('ASSIGN', id, param_addr)
+            dtype = None
+            try:
+                dtype = self.memory.get_data_type(id, self.scope)
+            except:
+                pass
+            if dtype == 'array':
+                self.pb.add_code('ASSIGN', f'#{id}', param_addr)
+            elif dtype == 'array-ptr':
+                self.pb.add_code('ASSIGN', f'{id}', param_addr)
+            else:
+                self.pb.add_code('ASSIGN', id, param_addr)
             self.ss.pop()
         elif type == 'FUN_END_CALL':
             self.memory.reset_param()
             fun_addr = self.ss.get_top()
             self.ss.pop()
-            self.pb.add_code('ASSIGN', '#' + str(self.pb.get_line() + 2), '3000')
+            fun_name = self.memory.get_function_name(fun_addr)
+            fun_return_addr = self.memory.get_function_return_addr(fun_name)
+            self.pb.add_code('ASSIGN', '#' + str(self.pb.get_line() + 2), f'{fun_return_addr}')
             self.pb.add_code('JP', str(fun_addr))
             temp = self.memory.get_temp()
             func_ret = self.memory.get_function_type_with_line(fun_addr)
             if func_ret == 'int':
                 self.pb.add_code('ASSIGN', '2000', f'{temp}')
                 self.ss.push(temp)
+        elif type == 'DEL_TMP':
+            try:
+                tmp = int(self.ss.get_top())
+                if tmp >= 3100:
+                    self.ss.pop()
+            except:
+                pass
+                
 
+        print(f'{self.memory.param_pointer}'.center(100,'-'))
         print(f'stack: {self.ss.stack}')
         self.pb.print_block()
         print("************************************"*10)

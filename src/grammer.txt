@@ -36,7 +36,7 @@ Term-prime -> Factor-prime G
 Term-zegond -> Factor-zegond G
 G -> * Factor MUL G | EPSILON
 Factor -> ( Expression ) | PID ID Var-call-prime | PNUM NUM
-Var-call-prime -> ( Args ) | Var-prime
+Var-call-prime -> ( Args ) FUN_END_CALL | Var-prime
 Var-prime -> [ Expression ] ARR_ACC | EPSILON
 Factor-prime -> ( Args ) FUN_END_CALL | EPSILON
 Factor-zegond -> ( Expression ) | PNUM NUM

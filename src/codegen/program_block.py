@@ -9,6 +9,7 @@ class ProgramBlock:
         self.line += 1
 
     def set_instruction(self, index, opcode, oper1='', oper2='', oper3=''):
+        print(index, opcode, oper1, oper2, oper3)
         self.codes[index] = f"({opcode}, {oper1}, {oper2}, {oper3})"
 
     def add_empty_block(self):
